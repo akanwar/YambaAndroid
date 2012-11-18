@@ -21,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".UpdaterService" />
         <activity android:name="PrefsActivity" android:label="@string/titlePrefs"></activity>
         
 

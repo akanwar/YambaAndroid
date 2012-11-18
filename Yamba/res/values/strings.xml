@@ -14,6 +14,10 @@
     <string name="summaryPassword">Logic Monitor Password</string>
     <string name="summaryCompany">Logic Monitor Company</string>
     <string name="titlePrefs">Preferences</string>
+    <string name="titleServiceStart">Start Service</string>
+    <string name="titleServiceStop">Stop Service</string>
+    
+    
     
 
 </resources>

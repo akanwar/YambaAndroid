@@ -63,31 +63,19 @@ public class StatusActivity extends Activity implements OnClickListener { //
     SharedPreferences prefs;
     YambaApplication yamba;
     
-    //private String Username = null; 
-    //private String Password = null;
-    //private String Company  = null;
     
-    
-    
-	//private HttpClient httpclient = new DefaultHttpClient();
-	//private CookieStore cookieStore = new BasicCookieStore();
-	//private HttpContext localContext = new BasicHttpContext();
-	
-	
-
     /** Called when the activity is first created. */
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.activity_status);
+    
     	// Find views
     	editText = (EditText) findViewById(R.id.editText); //
     	updateButton = (Button) findViewById(R.id.buttonUpdate);
     	updateButton.setOnClickListener(this); 
     	
-    	//prefs = PreferenceManager.getDefaultSharedPreferences(this); //
-    	//prefs.registerOnSharedPreferenceChangeListener(this);
     	
     	try {
     		yamba = ((YambaApplication) getApplication()); //
@@ -100,53 +88,10 @@ public class StatusActivity extends Activity implements OnClickListener { //
     		Log.d(TAG, "Exception trying to login");
     	}
     	
-    	//String loginresp = lomoLogin(Company, Username, Password);
-    	//TBD is the login successful or not ?
     }
     
-    /* moved to Yamba Application
-    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-    	// invalidate twitter object
-       Username = null; 
-       Password = null;
-       Company  = null;
-       Username = prefs.getString("Username", "");
-       Password = prefs.getString("Password", "");
-       Company = prefs.getString("Company", "");
-       String loginresp = lomoLogin(Company, Username, Password);
-    }
-  
-    
-    private String lomoLogin (String Company, String UserName, String Pwd) {
-    	
-    	//public static final String LOMO_URL_STRING = "http://citrix.logicmonitor.com/santaba/rpc/signIn?c=citrix&u=apiuser&p=helloworld";
-    	
-    	String loginURL = "http://".concat(Company).concat(".logicmonitor.com/santaba/rpc/signIn?c=").concat(Company).concat("&u=").concat(UserName).concat("&p=").concat(Pwd);
-    	Log.d(TAG,loginURL);
-    	
-    	localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
-    	HttpGet httpget = new HttpGet(loginURL);
-    	HttpResponse response = null;
-        try {
-        	response = httpclient.execute(httpget);	
-        } catch (ClientProtocolException e) {
-            Log.d(TAG, "ClientProtocolException encountered.");
-            e.printStackTrace();
-        } catch (Exception e){
-        	Log.d(TAG, "Login Exception encountered.");
-            e.printStackTrace();
-        } 
-        
-        String status = response.getStatusLine().toString();
-        Log.d(TAG, status);
-        
-        //TBD modify to return different codes for successful and failed logins
-        
-    	return status;
-    	
-    }
-  */
-    
+
+    /*
     class GetLomoAlerts extends AsyncTask<String, Integer, String> { //
     	
     	// public static final String LOMO_GETALERTS_STRING = "http://citrix.logicmonitor.com/santaba/rpc/getAlerts?c=citrix&u=apiuser&p=helloworld";
@@ -243,11 +188,12 @@ public class StatusActivity extends Activity implements OnClickListener { //
     }
     
     
+    */
     
     // Called when button is clicked
     public void onClick(View v) {
    		String status = editText.getText().toString();
-   		new GetLomoAlerts().execute(status); //
+   		//new GetLomoAlerts().execute(status); //
    		Log.d(TAG, "onClicked");
    	}    	
     	
@@ -264,6 +210,12 @@ public class StatusActivity extends Activity implements OnClickListener { //
     	switch (item.getItemId()) { //
     	case R.id.itemPrefs:
     		startActivity(new Intent(this, PrefsActivity.class)); //
+    		break;
+    	case R.id.itemServiceStart:
+    		startService(new Intent(this, UpdaterService.class)); //
+    		break;
+    		case R.id.itemServiceStop:
+    		stopService(new Intent(this, UpdaterService.class)); //
     		break;
     	}
     	return true; //
