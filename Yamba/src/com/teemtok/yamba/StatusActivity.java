@@ -79,10 +79,10 @@ public class StatusActivity extends Activity implements OnClickListener { //
     	
     	try {
     		yamba = ((YambaApplication) getApplication()); //
-    		LomoData lomo1 = yamba.getLomoData();
+    		LomoCredentials lomo1 = yamba.getLomoCredentials();
     		String ystatus = null;
 			if ( lomo1 != null) { ystatus = yamba.lomoLogin(lomo1); }
-			Log.d(TAG, ystatus);
+			Log.d(TAG, "ystatus is " + ystatus);
 			
     	} catch (Exception e) {
     		Log.d(TAG, "Exception trying to login");
@@ -90,111 +90,12 @@ public class StatusActivity extends Activity implements OnClickListener { //
     	
     }
     
-
-    /*
-    class GetLomoAlerts extends AsyncTask<String, Integer, String> { //
-    	
-    	// public static final String LOMO_GETALERTS_STRING = "http://citrix.logicmonitor.com/santaba/rpc/getAlerts?c=citrix&u=apiuser&p=helloworld";
-    	public static final String LOMO_GETALERTS_STRING = "http://citrix.logicmonitor.com/santaba/rpc/getAlerts";
-
-    	private static final String TAG = "StatusActivityGetLomoAlerts";
-    	
-    	@Override
-    	protected String doInBackground(String... statuses) { //
-    		
-        	////HttpClient httpclient = yamba.gethttpClient();
-        	//CookieStore cookieStore = yamba.getcookieStore();
-        	//HttpContext localContext = yamba.getlocalContext();
-        	
-        	//yamba.getlocalContext().setAttribute(ClientContext.COOKIE_STORE, yamba.getcookieStore());     	
-        	HttpClient httpclient = new DefaultHttpClient();
-        	
-        	
-        	HttpGet httpget = new HttpGet(LOMO_GETALERTS_STRING);
-        	HttpResponse response = null;
-        	String status = null;
-        	
-            try {
-            	
-            	response = httpclient.execute(httpget, yamba.getlocalContext());
-            	httpclient.getConnectionManager().shutdown();
-            	
-            	
-                status = response.getStatusLine().toString();
-                Log.d(TAG, status);
-                
-                // Get hold of the response entity
-                HttpEntity entity = response.getEntity();
-
-                // If the response does not enclose an entity, there is no need
-                // to worry about connection release
-                if (entity != null) {
-                	
-                	Log.d(TAG, "entity is not null");
-                    InputStream instream = entity.getContent();
-                    try {
-
-                        BufferedReader reader = new BufferedReader(
-                                new InputStreamReader(instream));
-                        
-                        StringBuilder sb = new StringBuilder();
-
-                        String line = null;
-                        while ((line = reader.readLine()) != null) {
-                                sb.append(line + "\n");
-                                Log.d(TAG, line);
-                         }
-                             
-
-
-                    } catch (Exception ex) {
-
-                        // In case of an IOException the connection will be released
-                        // back to the connection manager automatically
-                        throw ex;
-
-                    } finally {
-
-                        // Closing the input stream will trigger connection release
-                        instream.close();
-                    }
-                	
-                }
-
-            	
-            } catch (ClientProtocolException e) {
-                Log.d(TAG, "ClientProtocolException encountered.");
-                e.printStackTrace();
-            } catch (Exception e){
-            	Log.d(TAG, "GetAlerts Exception encountered.");
-                e.printStackTrace();
-            } 
-            return status;
-           
-    	}
-    	
-    	// Called when there's a status to be updated
-    	@Override
-    	protected void onProgressUpdate(Integer... values) { //
-    		super.onProgressUpdate(values);
-    		// Not used in this case
-    	}
-    	
-    	// Called once the background activity has completed
-    	@Override
-    	protected void onPostExecute(String result) { //
-    		Toast.makeText(StatusActivity.this, result, Toast.LENGTH_LONG).show();
-    	}
-    }
-    
-    
-    */
-    
     // Called when button is clicked
     public void onClick(View v) {
    		String status = editText.getText().toString();
-   		//new GetLomoAlerts().execute(status); //
-   		Log.d(TAG, "onClicked");
+   		Log.d(TAG, "onClicked Starting Alerts Activity");
+   		startActivity(new Intent(this, AlertActivity.class));
+   		
    	}    	
     	
     	

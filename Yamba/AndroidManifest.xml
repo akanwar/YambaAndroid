@@ -23,6 +23,7 @@
         </activity>
         <service android:name=".UpdaterService" />
         <activity android:name="PrefsActivity" android:label="@string/titlePrefs"></activity>
+        <activity android:name="AlertActivity" android:label="@string/titleAlerts"></activity>
         
 
             

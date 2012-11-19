@@ -6,7 +6,7 @@
     <string name="title_activity_status">StatusActivity</string>
     <string name="hintText">Status Window hint</string>
     <string name="titleStatus">TitleStatus</string>
-    <string name="buttonUpdate">Update</string>
+    <string name="buttonUpdate">Get Alerts</string>
     <string name="titleUsername">Username</string>
     <string name="titlePassword">Password</string>
     <string name="titleCompany">Company</string>
@@ -15,9 +15,21 @@
     <string name="summaryCompany">Logic Monitor Company</string>
     <string name="titlePrefs">Preferences</string>
     <string name="titleServiceStart">Start Service</string>
-    <string name="titleServiceStop">Stop Service</string>
-    
-    
-    
+    <string name="rowHost">HostName</string>
+    <string name="rowStartOnLocal">Alert Time</string>
+    <string name="rowDataSourceInstance">Data Source</string>
+    <string name="rowThreshold">Threshold</string>
+    <string name="rowValue">Value</string>
+    <string name="rowAlertLevel">Alert Level</string>
+    <string name="titleAlerts">Alerts</string>
+    <string name="titleServiceStop">Service Stop</string>
+    <string name="rowCriticalCount">0</string>
+    <string name="rowErrorCount">0</string>
+    <string name="rowWarnCount">0</string>
 
+    <string name="ptr_pull_to_refresh">Pull to refresh</string>
+    <string name="ptr_release_to_refresh">Release to refresh</string>
+    <string name="ptr_refreshing">Refreshing</string>
+    <string name="ptr_last_updated">Updated: %1$s</string>
+    
 </resources>

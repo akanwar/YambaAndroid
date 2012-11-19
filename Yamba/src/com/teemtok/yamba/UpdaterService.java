@@ -24,8 +24,8 @@ public class UpdaterService extends Service {
 	private Updater updater;
 	private YambaApplication yamba;
 	
-	DbHelper dbHelper;
-	SQLiteDatabase db;
+	//DbHelper dbHelper;
+	//SQLiteDatabase db;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -39,7 +39,7 @@ public class UpdaterService extends Service {
 		this.updater = new Updater(); //
 		Log.d(TAG, "onCreated");
 		
-		dbHelper = new DbHelper(this);
+		//dbHelper = new DbHelper(this);
 		Log.d(TAG, "onCreated - DBhelper");
 	}
 
@@ -82,22 +82,13 @@ public class UpdaterService extends Service {
 				try {
 					// Some work goes here...
 					if (yamba.isloggedIn() ){
-						Log.d(TAG, "Already logged in");
+						Log.d(TAG, "Already logged in - calling getLomoAlerts");
+						yamba.getLomoAlerts();
 					} else {
-						Log.d(TAG, "Need to log in");			
+						Log.d(TAG, "Need to log in  - NOT calling getLomoAlerts");			
+					
 					}
-					
-					alertString = yamba.getLomoAlerts();
-					
-					try {
-			            parseJSONandUpdateDB();
-			             
-			        } catch (JSONException e) {
-			            // TODO Auto-generated catch block
-			            e.printStackTrace();
-			        }
-					
-					
+				
 					Log.d(TAG, "Updater ran");
 					Thread.sleep(DELAY); //
 				} catch (InterruptedException e) { //
@@ -107,8 +98,7 @@ public class UpdaterService extends Service {
 		}
 	} // Updater
 	
-	
-	
+	/*
 	private void parseJSONandUpdateDB() throws JSONException {
 		final String TAG1 = TAG.concat("-parseJSONandUpdateDB");
 		
@@ -149,22 +139,6 @@ public class UpdaterService extends Service {
 			
         }
 		
-		/*
-
-		for (Twitter.Status status : timeline) {
-			values.clear(); //
-			values.put(DbHelper1.C_ID, status.id);
-			values.put(DbHelper1.C_CREATED_AT, status.createdAt.getTime());
-			values.put(DbHelper1.C_SOURCE, status.source);
-			values.put(DbHelper1.C_TEXT, status.text);
-			values.put(DbHelper1.C_USER, status.user.name);
-			
-			db.insertOrThrow(DbHelper1.TABLE, null, values); //
-			
-			Log.d(TAG, String.format("%s: %s", status.user.name, status.text));
-
-		}
-		*/
 		
 		db.close();
 		
@@ -172,7 +146,7 @@ public class UpdaterService extends Service {
 		
 	}
 	
-	
+	*/
 	
 }
 
