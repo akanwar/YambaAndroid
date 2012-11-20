@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical" >
 
     <!-- Title -->
@@ -10,34 +10,42 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
-        <TextView
+        <Button
             android:id="@+id/textCriticalCount"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="4dp"
             android:layout_weight="1"
+            android:background="@drawable/button_red"
             android:gravity="center"
-            android:background="#ff0000"
-            android:text="@string/rowCriticalCount" />
+            android:text="@string/rowCriticalCount" 
+			style="@style/ButtonText"/>
 
-        <TextView
+        <Button
             android:id="@+id/textErrorCount"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="4dp"
             android:layout_weight="1"
+            android:background="@drawable/button_orange"
             android:gravity="center"
-            android:background="#FFA500"
-            android:text="@string/rowErrorCount" />
+            android:text="@string/rowErrorCount"             
+            style="@style/ButtonText"/>
 
-        <TextView
+        <Button
             android:id="@+id/textWarnCount"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="4dp"
             android:layout_weight="1"
+            android:background="@drawable/button_yellow"
             android:gravity="center"
-            android:background="#FFFF00"
-            android:text="@string/rowWarnCount" />
+            android:shadowColor="@android:color/darker_gray"
+            android:text="@string/rowWarnCount" 
+            style="@style/ButtonText"/>
+
     </LinearLayout>
-    <!-- Text output wrapper -->
+    <!-- android:background="#FFFF00" -->
 
     <com.teemtok.yamba.PullToRefreshListView
         android:id="@+id/listAlerts"

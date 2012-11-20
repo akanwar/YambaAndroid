@@ -187,8 +187,7 @@ public class YambaApplication extends Application implements
 	public void getLomoAlerts() {
 
 		// TBD: check for logged in and throw exception if not
-		
-		
+
 		
 		final String TAG1 = TAG.concat("-getLomoAlerts");
 
@@ -226,7 +225,7 @@ public class YambaApplication extends Application implements
 					String line = null;
 					while ((line = reader.readLine()) != null) {
 						sb.append(line + "\n");
-						Log.d(TAG1, line);
+						//Log.d(TAG1, line);
 					}
 
 				} catch (Exception ex) {
@@ -267,13 +266,7 @@ public class YambaApplication extends Application implements
 		
 
 	}
-	
-	
-
-	
-	// ///////////////////////////////
-	
-	
+		
 	private void parseJSONandUpdateDB() throws JSONException {
 		final String TAG1 = TAG.concat("-parseJSONandUpdateDB");
 		String alertLevel = null;
@@ -284,17 +277,9 @@ public class YambaApplication extends Application implements
 		
 		JSONObject alertsrootobject = jsonLomoAlertsOuterObject.getJSONObject("data");
 		int totalerts = alertsrootobject.getInt("total");
-		
-		
-		
-		 JSONArray alertsobject = alertsrootobject.getJSONArray("alerts");
-		
-		 
-		 Log.d(TAG1,"NUM ALERTS: "+totalerts+"   RESPONSE STATUS: "+responsestatus+"  LENGTH ALERTOBJECT ARRAY: "+alertsobject.length());
-		 
-		
-		//dbHelper.purgeData(db);
-		
+		JSONArray alertsobject = alertsrootobject.getJSONArray("alerts");
+		Log.d(TAG1,"NUM ALERTS: "+totalerts+"   RESPONSE STATUS: "+responsestatus+"  LENGTH ALERTOBJECT ARRAY: "+alertsobject.length());
+
 		ContentValues values = new ContentValues();
 		criticalCount = 0;
 		warnCount = 0;
@@ -315,26 +300,7 @@ public class YambaApplication extends Application implements
 			values.put(LomoData.C_STARTONUNIXTIME, alertsobject.getJSONObject(i).getString("startOn") );
 			values.put(LomoData.C_ALERTID, alertsobject.getJSONObject(i).getInt("id") );
 		
-
-			//db.insertOrThrow(DbHelper.TABLE, null, values);
 			lomodata.insertOrIgnore(values);
-			
-			
-			/*
-			if( alertLevel.equals("critical")){
-				criticalCount++;
-				Log.d(TAG1," Crtical Count: "+ criticalCount);
-			}
-			else if ( alertLevel.equals("warn")) {
-				warnCount++;
-				Log.d(TAG1," Warn Count: "+ warnCount);
-			}
-			else if ( alertLevel.equals("error")) {
-				errorCount++;
-				Log.d(TAG1," Error Count: "+ errorCount);
-			}
-			*/
-			
 			
         }
 		Log.d(TAG, "insertOrIgnore completed. Loop called "+ i +"times");
@@ -349,7 +315,5 @@ public class YambaApplication extends Application implements
 		int levelcount=lomodata.getAlertCount(level);
 		return Integer.toString(levelcount);
 	}
-
-	
 }
 

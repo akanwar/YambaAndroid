@@ -113,7 +113,12 @@ public class StatusActivity extends Activity implements OnClickListener { //
     		startActivity(new Intent(this, PrefsActivity.class)); //
     		break;
     	case R.id.itemServiceStart:
-    		startService(new Intent(this, UpdaterService.class)); //
+    		if (!yamba.isServiceRunning()) {
+    			startService(new Intent(this, UpdaterService.class)); //
+    			Log.d(TAG, "Service started");
+    		} else {
+    			Log.d(TAG, "Service is already running");
+    		}
     		break;
     		case R.id.itemServiceStop:
     		stopService(new Intent(this, UpdaterService.class)); //
