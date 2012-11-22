@@ -27,7 +27,7 @@ public class LomoData { //
 	private static final String GET_ALL_ORDER_BY = C_STARTONUNIXTIME + " DESC";
 	private static final String[] MAX_CREATED_AT_COLUMNS = { "max("
 			+ LomoData.C_STARTONUNIXTIME + ")" };
-	//private static final String[] DB_TEXT_COLUMNS = { C_TEXT };
+	long tableexists;
 
 	// DbHelper implementations
 	class DbHelper extends SQLiteOpenHelper {
@@ -35,9 +35,32 @@ public class LomoData { //
 			super(context, DB_NAME, null, DB_VERSION);
 		}
 
+		
+		boolean doesTableExist (SQLiteDatabase db) {
+			
+			String doesTableExistSQL = "SELECT count(name) as count FROM sqlite_master where name = '"+ TABLE+"'";
+			Cursor c = db.rawQuery(doesTableExistSQL, null);
+			c.moveToFirst();
+			tableexists = c.getLong(c.getColumnIndex("count"));
+			c.close();
+			
+			Log.d(TAG, "Chexking on database: " + doesTableExistSQL);
+			Log.d(TAG, "table exists :" + tableexists );
+			
+			if ( tableexists == 0 ) { 
+				return false;
+			} else {
+				return true;
+			}
+			
+			
+		}
+		
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			Log.i(TAG, "Creating database: " + DB_NAME);
+
+			if ( !doesTableExist(db) ) { 
+			Log.d(TAG, "Creating database: " + DB_NAME);
 			String sql = "create table " + TABLE + " (" 
 					+ C_ID + " integer primary key, " 
 					+ C_DATAPOINT + " text, "
@@ -52,6 +75,10 @@ public class LomoData { //
 					+ C_ALERTID + " integer) " ;
 			db.execSQL(sql); //
 			Log.d(TAG, "onCreated sql: " + sql);
+			} else {
+				Log.d(TAG, "Table exists so skipping Create ");
+			}
+			
 		}
 
 		// Called whenever newVersion != oldVersion
@@ -67,7 +94,10 @@ public class LomoData { //
 		
 		public void purgeData (SQLiteDatabase db) { //:
 			final String TAG1 = TAG.concat("-purgeData");
-			db.execSQL("drop table if exists " + TABLE); // drops the old database
+			//db.execSQL("drop table if exists " + TABLE); // drops the old database
+			if (  doesTableExist(db)) { 
+				db.delete(TABLE, null, null);
+			}
 			onCreate(db); // run onCreate to get new database
 			Log.d(TAG1, "purgeData set us up the bomb");
 		}
@@ -91,52 +121,13 @@ public class LomoData { //
 			db.insertWithOnConflict(TABLE, null, values,
 					SQLiteDatabase.CONFLICT_IGNORE); //
 		} finally {
-			db.close(); //
+			//db.close(); //
 		}
 	}
 
 	public Cursor getStatusUpdates() { //
 		SQLiteDatabase db = this.dbHelper.getReadableDatabase();
 		return db.query(TABLE, null, null, null, null, null, GET_ALL_ORDER_BY);
-	}
-
-	public long getLatestStatusCreatedAtTime() { //
-		SQLiteDatabase db = this.dbHelper.getReadableDatabase();
-		try {
-			Cursor cursor = db.query(TABLE, MAX_CREATED_AT_COLUMNS, null, null,
-					null, null, null);
-			try {
-				return cursor.moveToNext() ? cursor.getLong(0) : Long.MIN_VALUE;
-			} finally {
-				cursor.close();
-			}
-		} finally {
-			db.close();
-		}
-	}
-
-
-	public int getAlertCount(String level) { //
-		SQLiteDatabase db = this.dbHelper.getReadableDatabase();
-		int ret = 0;
-
-		final String SQL_STATEMENT = "SELECT COUNT(*) FROM lomoalerts where level=?";
-
-		try {
-			Cursor cursor = db.rawQuery(SQL_STATEMENT, new String[] { level });
-
-			try {
-				ret = cursor.moveToNext() ? cursor.getInt(0) : 0;
-			} finally {
-				cursor.close();
-			}
-		} finally {
-			db.close();
-		}
-
-		Log.d(TAG, "getAlertCount for level " + level + "returning " + ret);
-		return ret;
-		// query(TABLE, null, null, null, null, null, GET_ALL_ORDER_BY);
 	}
 
 	/*
@@ -154,24 +145,31 @@ public class LomoData { //
 			db.close();
 		}
 	}
-	
-	
+*/
 
-	public String getStatusTextById(long id) { //
+	public int getAlertCount(String level) { //
 		SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+		int ret = 0;
+
+		final String SQL_STATEMENT = "SELECT COUNT(*) FROM lomoalerts where level=?";
+
 		try {
-			Cursor cursor = db.query(TABLE, DB_TEXT_COLUMNS, C_ID + "=" + id,
-					null, null, null, null);
+			Cursor cursor = db.rawQuery(SQL_STATEMENT, new String[] { level });
+
 			try {
-				return cursor.moveToNext() ? cursor.getString(0) : null;
+				ret = cursor.moveToNext() ? cursor.getInt(0) : 0;
 			} finally {
 				cursor.close();
 			}
 		} finally {
-			db.close();
+			//db.close();
 		}
+
+		Log.d(TAG, "getAlertCount for level " + level + "returning " + ret);
+		return ret;
+		// query(TABLE, null, null, null, null, null, GET_ALL_ORDER_BY);
 	}
-	*/
+
 
 	public void purgeDataBeforeInsert() { //
 		Log.d(TAG, "purgeDataBeforeInsert");
@@ -179,7 +177,7 @@ public class LomoData { //
 		try {
 			dbHelper.purgeData(db);
 		} finally {
-			db.close(); //
+			//db.close(); //
 		}
 	}
 }

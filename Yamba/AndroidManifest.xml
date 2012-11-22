@@ -8,10 +8,10 @@
         android:targetSdkVersion="8" />
 
     <application
+        android:name=".YambaApplication"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" 
-        android:name=".YambaApplication">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".StatusActivity"
             android:label="@string/title_activity_status" >
@@ -21,14 +21,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".UpdaterService" />
-        <activity android:name="PrefsActivity" android:label="@string/titlePrefs"></activity>
-        <activity android:name="AlertActivity" android:label="@string/titleAlerts"></activity>
-        
 
-            
+        <service android:name=".UpdaterService" />
+
+        <activity
+            android:name="PrefsActivity"
+            android:label="@string/titlePrefs" >
+        </activity>
+        <activity
+            android:name="AlertActivity"
+            android:label="@string/titleAlerts" >
+        </activity>
+        <activity
+            android:name=".AlertDetailActivity"
+            android:label="@string/title_activity_alert_detail" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.teemtok.yamba.AlertActivity" />
+        </activity>
     </application>
-    
-	<uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

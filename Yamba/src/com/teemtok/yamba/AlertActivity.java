@@ -12,14 +12,17 @@ import android.os.Bundle;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.view.View.OnClickListener;
 
-public class AlertActivity extends Activity implements OnClickListener {
+public class AlertActivity extends Activity implements OnClickListener, OnItemClickListener {
 
 	DbHelper dbHelper;
 	SQLiteDatabase db;
@@ -35,13 +38,15 @@ public class AlertActivity extends Activity implements OnClickListener {
 	private YambaApplication yamba;
 	private static final String TAG = AlertActivity.class.getSimpleName();
 
+	/*
 	static final String[] FROM = { DbHelper.C_HOST,
 			DbHelper.C_STARTONLOCALTIME, DbHelper.C_DATASOURCEINSTANCE,
 			DbHelper.C_THRESHOLDS, DbHelper.C_VALUE, DbHelper.C_LEVEL }; //
 	static final int[] TO = { R.id.textHost, R.id.textStartOnLocal,
 			R.id.textDataSourceInstance, R.id.textThreshold, R.id.textValue,
 			R.id.textAlertLevel }; //
-
+	 */
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -57,6 +62,7 @@ public class AlertActivity extends Activity implements OnClickListener {
 		textcriticalCount.setOnClickListener(this);
 
 		listView = (PullToRefreshListView) findViewById(R.id.listAlerts);
+		
 		listView.setOnRefreshListener(new OnRefreshListener() {
 
 			@Override
@@ -67,6 +73,9 @@ public class AlertActivity extends Activity implements OnClickListener {
 				listView.onRefreshComplete();
 			}
 		});
+		
+
+		listView.setOnItemClickListener(this);
 
 		// Connect to database
 
@@ -74,6 +83,16 @@ public class AlertActivity extends Activity implements OnClickListener {
 		db = dbHelper.getReadableDatabase();
 		this.yamba = (YambaApplication) getApplication();
 	}
+	
+	@Override
+	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+			// TODO Auto-generated method stub
+		Log.d(TAG, "You clicked on view : "+ arg1.getId() + " position : " + arg2 + " and id : " + arg3);
+		Intent myIntent = new Intent(this, AlertDetailActivity.class);
+		myIntent.putExtra("primarykey", arg3);
+		startActivity(myIntent);
+	}
+	
 
 	@Override
 	public void onStop() {
@@ -130,10 +149,7 @@ public class AlertActivity extends Activity implements OnClickListener {
 
 		if (cursor != null) {
 			startManagingCursor(cursor);
-			// Set up the adapter
-			//adapter = new SimpleCursorAdapter(this, R.layout.alert_row, cursor,	FROM, TO); //
 			colorAdapter = new ColorLevelAdapter(this, cursor);
-			//listView.setAdapter(adapter); //
 			listView.setAdapter(colorAdapter);
 		} else {
 			Log.d(TAG, "cursor was NULL");
@@ -146,9 +162,7 @@ public class AlertActivity extends Activity implements OnClickListener {
 	}
 
 	public void onClick(View v) {
-		// String status = editText.getText().toString();
 		Log.d(TAG, "onClicked Level Count button in Alerts Activity" + v.getId());
-
 			
 	   	switch ( v.getId()) { //
     	case R.id.textCriticalCount:
@@ -160,9 +174,14 @@ public class AlertActivity extends Activity implements OnClickListener {
     	case R.id.textWarnCount:
 			refreshAlertData("warn");
     		break;
+    	default:
+			Log.d(TAG,"onClick called with default");
+    		break;
+    	
     	}
-		
-//		refreshAlertData("");
 
 	}
+
+
+	
 }

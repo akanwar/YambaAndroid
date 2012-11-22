@@ -12,10 +12,10 @@ public class ColorLevelAdapter extends SimpleCursorAdapter { //
 
 	static final String[] FROM = { DbHelper.C_HOST,
 			DbHelper.C_STARTONLOCALTIME, DbHelper.C_DATASOURCEINSTANCE,
-			DbHelper.C_THRESHOLDS, DbHelper.C_VALUE, DbHelper.C_LEVEL }; //
+			DbHelper.C_THRESHOLDS, DbHelper.C_VALUE, DbHelper.C_LEVEL, DbHelper.C_ID}; //
 	static final int[] TO = { R.id.textHost, R.id.textStartOnLocal,
 			R.id.textDataSourceInstance, R.id.textThreshold, R.id.textValue,
-			R.id.textAlertLevel }; //
+			R.id.textAlertLevel, R.id.textprimaryKey}; //
 
 	// Constructor
 
