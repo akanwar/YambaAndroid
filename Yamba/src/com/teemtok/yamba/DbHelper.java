@@ -22,6 +22,9 @@ public class DbHelper extends SQLiteOpenHelper { //
 	static final String C_STARTONLOCALTIME = "startOnLocal";
 	static final String C_STARTONUNIXTIME = "startOn";
 	static final String C_ALERTID = "alertid";
+	static final String C_ISACKED = "isAcked";
+	static final String C_ACKCOMMENT = "ackComment";
+	
 	
 
 	

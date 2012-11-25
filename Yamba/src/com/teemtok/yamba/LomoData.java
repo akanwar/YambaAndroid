@@ -3,6 +3,7 @@ package com.teemtok.yamba;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
@@ -24,6 +25,8 @@ public class LomoData { //
 	static final String C_STARTONLOCALTIME = "startOnLocal";
 	static final String C_STARTONUNIXTIME = "startOn";
 	static final String C_ALERTID = "alertid";
+	static final String C_ISACKED = "isAcked";
+	static final String C_ACKCOMMENT = "ackComment";
 	private static final String GET_ALL_ORDER_BY = C_STARTONUNIXTIME + " DESC";
 	private static final String[] MAX_CREATED_AT_COLUMNS = { "max("
 			+ LomoData.C_STARTONUNIXTIME + ")" };
@@ -72,8 +75,17 @@ public class LomoData { //
 					+ C_THRESHOLDS + " text, "
 					+ C_STARTONLOCALTIME + " text, "
 					+ C_STARTONUNIXTIME + " integer, "
-					+ C_ALERTID + " integer) " ;
-			db.execSQL(sql); //
+					+ C_ALERTID + " integer, " 
+					+ C_ISACKED + " integer, "
+					+ C_ACKCOMMENT + " text) ";
+			
+			try {
+				db.execSQL(sql); //
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				Log.d(TAG, "Table creation failed due to error in create table query!!");
+				//e.printStackTrace();
+			}
 			Log.d(TAG, "onCreated sql: " + sql);
 			} else {
 				Log.d(TAG, "Table exists so skipping Create ");
@@ -130,22 +142,6 @@ public class LomoData { //
 		return db.query(TABLE, null, null, null, null, null, GET_ALL_ORDER_BY);
 	}
 
-	/*
-	public long getLatestStatusCreatedAtTime() { //
-		SQLiteDatabase db = this.dbHelper.getReadableDatabase();
-		try {
-			Cursor cursor = db.query(TABLE, MAX_CREATED_AT_COLUMNS, null, null,
-					null, null, null);
-			try {
-				return cursor.moveToNext() ? cursor.getLong(0) : Long.MIN_VALUE;
-			} finally {
-				cursor.close();
-			}
-		} finally {
-			db.close();
-		}
-	}
-*/
 
 	public int getAlertCount(String level) { //
 		SQLiteDatabase db = this.dbHelper.getReadableDatabase();

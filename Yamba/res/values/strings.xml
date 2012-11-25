@@ -53,5 +53,12 @@
     <string name="textvalstartonlocaltime">startonlocaltime</string>
     <string name="textAlertAckTitle">Acknowledge Alert</string>
     <string name="textAckButton">Submit Ack</string>
+    <string name="textAckCommentList">ACK Comment</string>
+    <string name="textAckedList">ACK </string>
+    <string name="textvalAckCommentList">ACK Comment</string>
+    <string name="textvalAckedList">ACK Comment</string>
+    <string name="rowDatapoint">Data Point</string>
+    
+    
 
 </resources>

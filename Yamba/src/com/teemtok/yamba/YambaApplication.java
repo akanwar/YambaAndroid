@@ -299,7 +299,14 @@ public class YambaApplication extends Application implements
 			values.put(LomoData.C_STARTONLOCALTIME, alertsobject.getJSONObject(i).getString("startOnLocal") );
 			values.put(LomoData.C_STARTONUNIXTIME, alertsobject.getJSONObject(i).getString("startOn") );
 			values.put(LomoData.C_ALERTID, alertsobject.getJSONObject(i).getInt("id") );
-		
+			boolean isackedFlag = alertsobject.getJSONObject(i).getBoolean("acked");
+			if (isackedFlag)
+			{
+				values.put(LomoData.C_ISACKED, 1);
+			} else {
+				values.put(LomoData.C_ISACKED, 0);
+			}
+			values.put(LomoData.C_ACKCOMMENT, alertsobject.getJSONObject(i).getString("ackComment").replaceAll("\n", "") );
 			lomodata.insertOrIgnore(values);
 			
         }
@@ -315,5 +322,79 @@ public class YambaApplication extends Application implements
 		int levelcount=lomodata.getAlertCount(level);
 		return Integer.toString(levelcount);
 	}
+	
+	
+	
+	
+	
+	public void pushAckandAckComment(String URL) {
+
+		// TBD: check for logged in and throw exception if not
+
+		
+		final String TAG1 = TAG.concat("-pushAckandAckComment");
+
+		//final String LOMO_GETALERTS_STRING = "http://citrix.logicmonitor.com/santaba/rpc/getAlerts";
+
+		HttpClient httpclient = new DefaultHttpClient();
+		HttpGet httpget = new HttpGet(URL);
+		Log.d(TAG1,"Reached Yamba pushing ACK, URL is: " + URL);
+		HttpResponse response = null;
+		String status = null;
+
+		try {
+
+			response = httpclient.execute(httpget, localContext);
+
+			status = response.getStatusLine().toString();
+			Log.d(TAG1, status);
+
+			// Get hold of the response entity
+			HttpEntity entity = response.getEntity();
+			
+			// If the response does not enclose an entity, there is no need
+			// to worry about connection release
+			if (entity != null) {
+
+				Log.d(TAG1, "entity is not null");
+				
+				InputStream instream = entity.getContent();
+				try {
+
+					BufferedReader reader = new BufferedReader(
+							new InputStreamReader(instream));
+
+					sb = new StringBuilder();
+
+					String line = null;
+					while ((line = reader.readLine()) != null) {
+						sb.append(line + "\n");
+						//Log.d(TAG1, line);
+					}
+
+				} catch (Exception ex) {
+
+					// In case of an IOException the connection will be released
+					// back to the connection manager automatically
+					throw ex;
+
+				} finally {
+
+					// Closing the input stream will trigger connection release
+					instream.close();
+				}
+
+			}
+
+		} catch (ClientProtocolException e) {
+			Log.d(TAG1, "ClientProtocolException encountered.");
+			e.printStackTrace();
+		} catch (Exception e) {
+			Log.d(TAG1, "GetAlerts Exception encountered.");
+			e.printStackTrace();
+		}
+
+	}
+
 }
 

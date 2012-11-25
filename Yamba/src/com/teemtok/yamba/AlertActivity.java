@@ -38,14 +38,6 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 	private YambaApplication yamba;
 	private static final String TAG = AlertActivity.class.getSimpleName();
 
-	/*
-	static final String[] FROM = { DbHelper.C_HOST,
-			DbHelper.C_STARTONLOCALTIME, DbHelper.C_DATASOURCEINSTANCE,
-			DbHelper.C_THRESHOLDS, DbHelper.C_VALUE, DbHelper.C_LEVEL }; //
-	static final int[] TO = { R.id.textHost, R.id.textStartOnLocal,
-			R.id.textDataSourceInstance, R.id.textThreshold, R.id.textValue,
-			R.id.textAlertLevel }; //
-	 */
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
