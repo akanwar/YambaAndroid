@@ -11,17 +11,26 @@
     android:textSize="30sp"
     android:layout_margin="10dp"
     android:text="@string/titleStatus"/>
-<!-- Status EditText -->
+<!-- 
 <EditText android:layout_width="fill_parent"
     android:layout_height="0dip"
     android:layout_weight="1"
     android:hint="@string/hintText" 
     android:id="@+id/editText"
     android:gravity="top|center_horizontal"></EditText>
+    -->
 <!-- Update Button -->
 <Button android:layout_width="fill_parent"
     android:layout_height="wrap_content" 
     android:text="@string/buttonUpdate"
     android:textSize="20sp" 
     android:id="@+id/buttonUpdate"></Button>
+
+<Button android:layout_width="fill_parent"
+    android:layout_height="wrap_content" 
+    android:text="@string/buttonListHosts"
+    android:textSize="20sp" 
+    android:id="@+id/idbuttonListHosts"></Button>
+
+
 </LinearLayout>

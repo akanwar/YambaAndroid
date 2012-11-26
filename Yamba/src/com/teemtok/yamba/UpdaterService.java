@@ -74,7 +74,12 @@ public class UpdaterService extends Service {
 					// Some work goes here...
 					if (yamba.isloggedIn() ){
 						Log.d(TAG, "Already logged in - calling getLomoAlerts");
-						yamba.getLomoAlerts();
+						if (yamba.getLomoAlerts()) {
+							Log.d (TAG,"Yamba Alerts call successfull");
+						} else {
+							Log.d (TAG,"Yamba Alerts call unsuccessfull");
+						}
+							
 					} else {
 						Log.d(TAG, "Need to log in  - NOT calling getLomoAlerts");			
 					

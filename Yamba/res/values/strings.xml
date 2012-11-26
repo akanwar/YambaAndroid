@@ -1,12 +1,13 @@
 <resources>
 
-    <string name="app_name">Yamba</string>
+    <string name="app_name">LogicMonitorAlerts</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_status">StatusActivity</string>
+    <string name="title_activity_status"></string>
     <string name="hintText">Status Window hint</string>
-    <string name="titleStatus">TitleStatus</string>
-    <string name="buttonUpdate">Get Alerts</string>
+    <string name="titleStatus">Logic Monitor</string>
+    <string name="buttonUpdate">Alerts</string>
+    <string name="buttonListHosts">Hosts</string>
     <string name="titleUsername">Username</string>
     <string name="titlePassword">Password</string>
     <string name="titleCompany">Company</string>
@@ -58,7 +59,6 @@
     <string name="textvalAckCommentList">ACK Comment</string>
     <string name="textvalAckedList">ACK Comment</string>
     <string name="rowDatapoint">Data Point</string>
-    
-    
+    <string name="title_activity_host_list">HostListActivity</string>
 
 </resources>

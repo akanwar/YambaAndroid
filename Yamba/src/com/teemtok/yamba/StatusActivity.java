@@ -58,8 +58,8 @@ public class StatusActivity extends Activity implements OnClickListener { //
 
 	
 	private static final String TAG = "StatusActivity";
-    EditText editText;
-    Button updateButton;
+    //EditText editText;
+    Button updateButton, hostButton;
     SharedPreferences prefs;
     YambaApplication yamba;
     
@@ -72,9 +72,12 @@ public class StatusActivity extends Activity implements OnClickListener { //
     	setContentView(R.layout.activity_status);
     
     	// Find views
-    	editText = (EditText) findViewById(R.id.editText); //
+    	//editText = (EditText) findViewById(R.id.editText); //
     	updateButton = (Button) findViewById(R.id.buttonUpdate);
     	updateButton.setOnClickListener(this); 
+    	
+    	hostButton = (Button) findViewById(R.id.idbuttonListHosts);
+    	hostButton.setOnClickListener(this); 
     	
     	
     	try {
@@ -88,13 +91,34 @@ public class StatusActivity extends Activity implements OnClickListener { //
     		Log.d(TAG, "Exception trying to login");
     	}
     	
+   		if (!yamba.isServiceRunning()) {
+			startService(new Intent(this, UpdaterService.class)); //
+			Log.d(TAG, "Service started");
+		} else {
+			Log.d(TAG, "Service is already running");
+		}
+   		
+ 
+    	
     }
     
     // Called when button is clicked
     public void onClick(View v) {
-   		String status = editText.getText().toString();
-   		Log.d(TAG, "onClicked Starting Alerts Activity");
-   		startActivity(new Intent(this, AlertActivity.class));
+   		
+	   	switch ( v.getId()) { //
+    	case R.id.buttonUpdate:
+       		Log.d(TAG, "onClicked Starting Alerts Activity");
+       		startActivity(new Intent(this, AlertActivity.class));
+    		break;
+    	case R.id.idbuttonListHosts:
+       		Log.d(TAG, "onClicked Starting Host List Activity");
+       		startActivity(new Intent(this, HostListActivity.class));
+    		break;
+    	default:
+			Log.d(TAG,"onClick called with default" + v.getId());
+    		break;
+    	
+    	}
    		
    	}    	
     	

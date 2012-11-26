@@ -183,7 +183,7 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 		} else {
 			Log.d(TAG, "cursor was NULL");
 		}
-		
+
 		cursor.close();
 
 	}
@@ -220,14 +220,14 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 
 	public void getpushAck() {
 
-		// TBD: check for logged in and throw exception if not
 		final String TAG1 = TAG.concat("-pushAck");
 		Context context = getApplicationContext();
-		CharSequence text = "Alert id: ".concat(idvalalertid.getText()
-				.toString().concat(" is acknowledged!!!"));
-		// int duration = Toast.LENGTH_SHORT;
+		CharSequence text;
+
 		int duration = Toast.LENGTH_LONG;
-		Toast toast = Toast.makeText(context, text, duration);
+
+		// int duration = Toast.LENGTH_SHORT;
+
 		// String ackComment = editAckText.getText().toString().replaceAll(" ",
 		// "+");
 		String LOMO_ACK_STRING = "http://citrix.logicmonitor.com/santaba/rpc/confirmAlerts?ids="
@@ -238,10 +238,27 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 						.concat(editAckText.getText().toString()
 								.replaceAll(" ", "+")));
 		Log.d(TAG1, "This is ACK URL: " + LOMO_ACK_STRING);
-		yamba.pushAckandAckComment(LOMO_ACK_STRING);
-		Log.d(TAG1, "done calling yamb push ack: ");
+		boolean ackworked = yamba.pushAckandAckComment(LOMO_ACK_STRING);
+		Log.d(TAG1, "done calling yamb push ack. success : " + ackworked);
+		
 		editAckText.setVisibility(View.INVISIBLE);
 		ackButton.setVisibility(View.INVISIBLE);
+
+		if (ackworked) {
+			text = "Alert id: ".concat(idvalalertid.getText().toString())
+					.concat(" is acked.");
+			if (yamba.getLomoAlerts()) {
+				Log.d (TAG1,"Yamba Alerts call successfull");
+			} else {
+				Log.d (TAG1,"Yamba Alerts call unsuccessfull");
+			}
+				
+		} else {
+			text = "Alert id: ".concat(idvalalertid.getText().toString())
+					.concat(" could not be acked.");
+		}
+
+		Toast toast = Toast.makeText(context, text, duration);
 		toast.show();
 
 	}

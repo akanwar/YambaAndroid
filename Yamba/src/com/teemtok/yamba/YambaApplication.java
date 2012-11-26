@@ -105,7 +105,7 @@ public class YambaApplication extends Application implements
 			if (lomo1 != null) {
 				ystatus = lomoLogin(lomo1);
 			}
-			Log.d(TAG, "End of preferred state change");
+			Log.d(TAG, "End of preference state change");
 			Log.d(TAG, ystatus);
 		} catch (Exception e) {
 			Log.d(TAG, "Exception trying to login");
@@ -114,6 +114,9 @@ public class YambaApplication extends Application implements
 	}
 
 	public String lomoLogin(LomoCredentials lomo) {
+		
+		int code;
+		int httpcode;
 
 		// public static final String LOMO_URL_STRING =
 		// "http://citrix.logicmonitor.com/santaba/rpc/signIn?c=citrix&u=apiuser&p=helloworld";
@@ -123,18 +126,26 @@ public class YambaApplication extends Application implements
 				.concat(lomo.getCompany()).concat("&u=")
 				.concat(lomo.getUsername()).concat("&p=")
 				.concat(lomo.getPassword());
-		Log.d(TAG, loginURL);
+		Log.d(TAG, "beginning of lomologin" + loginURL);
 
 		localContext.removeAttribute(ClientContext.COOKIE_STORE);
+		cookieStore.clear();
 		localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+		
+		String [] httpresp = executeHTTPwithStatus (loginURL);
+		
+		Log.d(TAG, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status" + httpresp[0]+"|"+ httpresp[1].length()+"|"+ httpresp[2]+"|"+ httpresp[3]);
+		
+		/*
 		HttpClient httpclient = new DefaultHttpClient();
 
 		HttpGet httpget = new HttpGet(loginURL);
 
 		HttpResponse response = null;
 		try {
+		
 			response = httpclient.execute(httpget, localContext);
-			httpclient.getConnectionManager().shutdown();
+			//httpclient.getConnectionManager().shutdown();
 		} catch (ClientProtocolException e) {
 			Log.d(TAG, "ClientProtocolException encountered.");
 			e.printStackTrace();
@@ -147,27 +158,130 @@ public class YambaApplication extends Application implements
 
 		
 		int code = response.getStatusLine().getStatusCode();
-
+		 */
+		
+		code = Integer.parseInt(httpresp[3]);
+		httpcode = Integer.parseInt(httpresp[0]);
+		
+		if (httpcode == 200) {
+			Log.d(TAG, "HTTP(header) is 200... good");
+		} else {
+			Log.d(TAG, "Connection error in HTTP(header) : " + httpcode);
+		}
+		
+		
 		if (code >= 400 && code < 500) {
-			Log.d(TAG, "end of lomoLogin returned HTTP between 400 and 500");
+			Log.d(TAG, "returned HTTP(in body) between 400 and 500 : code|errmsg" + code +"|"+httpresp[2]);
 			loggedIn = false;
 		} else if (code == 200) {
-			Log.d(TAG, "end of lomoLogin returned HTTP 200");
+			Log.d(TAG, "returned HTTP(in body) 200 : code|errmsg" + code +"|"+httpresp[2]);
 			loggedIn = true;
 		} else {
-			Log.d(TAG, "end of lomoLogin returned strange HTTP");
+			Log.d(TAG, "returned strange HTTP(in body): code|errmsg" + code +"|"+httpresp[2]);
 			loggedIn = false;
 		}
 
 		Log.d(TAG, "end of lomoLogin");
-		Log.d(TAG, status);
 
 		// TBD modify to return different codes for successful and failed logins
 
-		return status;
+		return httpresp[3];
 
 	}
 
+	
+	public String [] executeHTTPwithStatus (String url) {
+		
+		StringBuilder sblocal = null;
+		String statuslocal;
+		int codelocal;
+		HttpResponse responselocal = null;
+		
+		JSONObject jsonresponselocal = null;
+		String responsestatuslocal = null;
+		String errmsglocal = null;
+		
+		String [] responsearr = {"0","0","0","0"};
+
+		HttpClient httpclient = new DefaultHttpClient();
+		HttpGet httpget = new HttpGet(url);
+		
+		String TAG1 = TAG + "-executeHTTPwithStatus";
+		Log.d(TAG1, "url requestd is " + url);
+
+		try {
+	
+			responselocal = httpclient.execute(httpget, localContext);
+			statuslocal = responselocal.getStatusLine().toString();
+			codelocal = responselocal.getStatusLine().getStatusCode(); // TODO return
+			responsearr[0] = Integer.toString(codelocal); 
+			
+			HttpEntity entitylocal = responselocal.getEntity();
+			
+			if (entitylocal != null) {
+				Log.d(TAG1, "entity is not null");	
+				InputStream instream = entitylocal.getContent();
+				try {
+
+					BufferedReader reader = new BufferedReader(
+							new InputStreamReader(instream));
+
+					sblocal = new StringBuilder();
+
+					String line = null;
+					while ((line = reader.readLine()) != null) {
+						sblocal.append(line + "\n");
+						//Log.d(TAG1, line);
+					}
+					Log.d(TAG1, "First 100 chars of the response are: " + sblocal.substring(0, Math.min(sblocal.length(), 100)));
+				} catch (Exception ex) {
+					throw ex;
+				} finally {
+					instream.close();
+				}
+
+
+			}
+			
+		
+			
+		} catch (ClientProtocolException e) {
+			Log.d(TAG1, "ClientProtocolException encountered.");
+			e.printStackTrace();
+		} catch (Exception e) {
+			Log.d(TAG1, "Http GET Exception encountered." + responselocal.getStatusLine().toString() );
+			e.printStackTrace();
+		}
+
+		
+
+		try {
+			jsonresponselocal = new JSONObject(sblocal.toString());
+			
+		
+			responsestatuslocal = jsonresponselocal.getString("status"); //TODO return
+			errmsglocal = jsonresponselocal.getString("errmsg"); //TODO return
+			
+			responsearr[1] = sblocal.toString(); 
+			responsearr[2] = errmsglocal;
+			responsearr[3] = responsestatuslocal;
+			
+			
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return responsearr; 
+
+		
+		
+		
+		
+	}
+	
 	public boolean isServiceRunning() { //
 		return serviceRunning;
 	}
@@ -184,78 +298,49 @@ public class YambaApplication extends Application implements
 		this.loggedIn = loggedIn;
 	}
 
-	public void getLomoAlerts() {
+	public synchronized boolean getLomoAlerts() {
 
 		// TBD: check for logged in and throw exception if not
 
+		boolean success = false;
+		int code = 0;
+		int httpcode = 0;
 		
 		final String TAG1 = TAG.concat("-getLomoAlerts");
 
-		final String LOMO_GETALERTS_STRING = "http://citrix.logicmonitor.com/santaba/rpc/getAlerts";
-
-		HttpClient httpclient = new DefaultHttpClient();
-		HttpGet httpget = new HttpGet(LOMO_GETALERTS_STRING);
-		HttpResponse response = null;
-		String status = null;
-
-		try {
-
-			response = httpclient.execute(httpget, localContext);
-
-			status = response.getStatusLine().toString();
-			Log.d(TAG1, status);
-
-			// Get hold of the response entity
-			HttpEntity entity = response.getEntity();
-			
-			// If the response does not enclose an entity, there is no need
-			// to worry about connection release
-			if (entity != null) {
-
-				Log.d(TAG1, "entity is not null");
-				
-				InputStream instream = entity.getContent();
-				try {
-
-					BufferedReader reader = new BufferedReader(
-							new InputStreamReader(instream));
-
-					sb = new StringBuilder();
-
-					String line = null;
-					while ((line = reader.readLine()) != null) {
-						sb.append(line + "\n");
-						//Log.d(TAG1, line);
-					}
-
-				} catch (Exception ex) {
-
-					// In case of an IOException the connection will be released
-					// back to the connection manager automatically
-					throw ex;
-
-				} finally {
-
-					// Closing the input stream will trigger connection release
-					instream.close();
-				}
-				
-				// 
-			
-	
-			}
-
-		} catch (ClientProtocolException e) {
-			Log.d(TAG1, "ClientProtocolException encountered.");
-			e.printStackTrace();
-		} catch (Exception e) {
-			Log.d(TAG1, "GetAlerts Exception encountered.");
-			e.printStackTrace();
+		//final String LOMO_GETALERTS_STRING = "http://citrix.logicmonitor.com/santaba/rpc/getAlerts";
+		final String LOMO_GETALERTS_STRING = "http://".concat(lomo.getCompany())
+				.concat(".logicmonitor.com/santaba/rpc/getAlerts");
+		Log.d(TAG1, "beginning of Lomo Alerts URL is: " + LOMO_GETALERTS_STRING);
+		
+		String [] httpresp = executeHTTPwithStatus (LOMO_GETALERTS_STRING);		
+		Log.d(TAG1, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status" + httpresp[0]+"|"+ httpresp[1].length()+"|"+ httpresp[2]+"|"+ httpresp[3]);
+		code = Integer.parseInt(httpresp[3]);
+		httpcode = Integer.parseInt(httpresp[0]);
+		if (httpcode == 200) {
+			Log.d(TAG1, "HTTP(header) is 200... good");
+		} else {
+			Log.d(TAG1, "Connection error in HTTP(header) : " + httpcode);
+		}
+		
+		
+		if (code >= 400 && code < 500) {
+			Log.d(TAG1, "returned HTTP(in body) between 400 and 500 : code|errmsg" + code +"|"+httpresp[2]);
+			success = false;
+		} else if (code == 200) {
+			Log.d(TAG1, "returned HTTP(in body) 200 : code|errmsg" + code +"|"+httpresp[2]);
+			success = true;
+		} else {
+			Log.d(TAG1, "returned strange HTTP(in body): code|errmsg" + code +"|"+httpresp[2]);
+			success = false;
 		}
 
+		// TBD modify to return different codes for successful and failed logins
+
 		// TBD format response into a list generic of some sort
-		alertString = sb.toString();
-		lomodata.purgeDataBeforeInsert();
+		alertString = httpresp[1];	
+		if(success){
+			lomodata.purgeDataBeforeInsert();
 		try {
             parseJSONandUpdateDB();
              
@@ -263,19 +348,43 @@ public class YambaApplication extends Application implements
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+		}
 		
-
+		return success;
+		
 	}
 		
 	private void parseJSONandUpdateDB() throws JSONException {
 		final String TAG1 = TAG.concat("-parseJSONandUpdateDB");
+		JSONObject jsonLomoAlertsOuterObject = null;
 		String alertLevel = null;
+		String responsestatus = null;
+		JSONObject alertsrootobject = null;
 		
-		JSONObject jsonLomoAlertsOuterObject = new JSONObject(alertString);
+		Log.d(TAG1,"Alert Response String is: " + alertString.length());
 		
-		String responsestatus = jsonLomoAlertsOuterObject.getString("status");
+		try {
+			jsonLomoAlertsOuterObject = new JSONObject(alertString);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Log.d(TAG1,"Root JSON object (jsonLomoAlertsOuterObject) creation failed: " + jsonLomoAlertsOuterObject);
+		}
 		
-		JSONObject alertsrootobject = jsonLomoAlertsOuterObject.getJSONObject("data");
+		
+		try {
+			responsestatus = jsonLomoAlertsOuterObject.getString("status");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Log.d(TAG1,"Read on response status from JSON object failed: " + responsestatus);
+		}
+		
+		
+		try {
+			alertsrootobject = jsonLomoAlertsOuterObject.getJSONObject("data");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Log.d(TAG1,"creation of JSON object for DATA (alertsrootobject) failed: " + alertsrootobject);
+		}
 		int totalerts = alertsrootobject.getInt("total");
 		JSONArray alertsobject = alertsrootobject.getJSONArray("alerts");
 		Log.d(TAG1,"NUM ALERTS: "+totalerts+"   RESPONSE STATUS: "+responsestatus+"  LENGTH ALERTOBJECT ARRAY: "+alertsobject.length());
@@ -325,76 +434,105 @@ public class YambaApplication extends Application implements
 	
 	
 	
-	
-	
-	public void pushAckandAckComment(String URL) {
+	// Used by alert detail activity
+	public boolean pushAckandAckComment(String URL) {
 
 		// TBD: check for logged in and throw exception if not
 
+		int code;
+		int httpcode;
+		boolean success = false;
 		
 		final String TAG1 = TAG.concat("-pushAckandAckComment");
-
-		//final String LOMO_GETALERTS_STRING = "http://citrix.logicmonitor.com/santaba/rpc/getAlerts";
-
-		HttpClient httpclient = new DefaultHttpClient();
-		HttpGet httpget = new HttpGet(URL);
 		Log.d(TAG1,"Reached Yamba pushing ACK, URL is: " + URL);
-		HttpResponse response = null;
-		String status = null;
-
-		try {
-
-			response = httpclient.execute(httpget, localContext);
-
-			status = response.getStatusLine().toString();
-			Log.d(TAG1, status);
-
-			// Get hold of the response entity
-			HttpEntity entity = response.getEntity();
-			
-			// If the response does not enclose an entity, there is no need
-			// to worry about connection release
-			if (entity != null) {
-
-				Log.d(TAG1, "entity is not null");
-				
-				InputStream instream = entity.getContent();
-				try {
-
-					BufferedReader reader = new BufferedReader(
-							new InputStreamReader(instream));
-
-					sb = new StringBuilder();
-
-					String line = null;
-					while ((line = reader.readLine()) != null) {
-						sb.append(line + "\n");
-						//Log.d(TAG1, line);
-					}
-
-				} catch (Exception ex) {
-
-					// In case of an IOException the connection will be released
-					// back to the connection manager automatically
-					throw ex;
-
-				} finally {
-
-					// Closing the input stream will trigger connection release
-					instream.close();
-				}
-
-			}
-
-		} catch (ClientProtocolException e) {
-			Log.d(TAG1, "ClientProtocolException encountered.");
-			e.printStackTrace();
-		} catch (Exception e) {
-			Log.d(TAG1, "GetAlerts Exception encountered.");
-			e.printStackTrace();
+		
+		
+		String [] httpresp = executeHTTPwithStatus (URL);
+		Log.d(TAG1, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status" + httpresp[0]+"|"+ httpresp[1].length()+"|"+ httpresp[2]+"|"+ httpresp[3]);
+		
+		
+		code = Integer.parseInt(httpresp[3]);
+		httpcode = Integer.parseInt(httpresp[0]);
+		
+		if (httpcode == 200) {
+			Log.d(TAG1, "HTTP(header) is 200... good");
+		} else {
+			Log.d(TAG1, "Connection error in HTTP(header) : " + httpcode);
+		}
+		
+		
+		if (code >= 400 && code < 500) {
+			Log.d(TAG1, "returned HTTP(in body) between 400 and 500 : code|errmsg" + code +"|"+httpresp[2]);
+			success = false;
+		} else if (code == 200) {
+			Log.d(TAG1, "returned HTTP(in body) 200 : code|errmsg" + code +"|"+httpresp[2]);
+			success = true;
+		} else {
+			Log.d(TAG1, "returned strange HTTP(in body): code|errmsg" + code +"|"+httpresp[2]);
+			success = false;
 		}
 
+		// TBD modify to return different codes for successful and failed logins
+
+		return success;
+
 	}
+	
+	
+	
+	
+	// Used by Host List Activity 
+
+	public String[] getHostGroups() {
+
+		int code;
+		int httpcode;
+		boolean success = false;
+		
+		final String TAG1 = TAG.concat("-getHostGroups");
+		
+		final String LOMO_GETHOSTGROUPS_STRING = "http://".concat(lomo.getCompany())
+				.concat(".logicmonitor.com/santaba/rpc/getHostGroups");
+		
+		String [] httpresp = executeHTTPwithStatus (LOMO_GETHOSTGROUPS_STRING);
+		Log.d(TAG1, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status" + httpresp[0]+"|"+ httpresp[1].length()+"|"+ httpresp[2]+"|"+ httpresp[3]);
+		
+		
+		code = Integer.parseInt(httpresp[3]);
+		httpcode = Integer.parseInt(httpresp[0]);
+		
+		if (httpcode == 200) {
+			Log.d(TAG1, "HTTP(header) is 200... good");
+		} else {
+			Log.d(TAG1, "Connection error in HTTP(header) : " + httpcode);
+		}
+		
+		
+		if (code >= 400 && code < 500) {
+			Log.d(TAG1, "returned HTTP(in body) between 400 and 500 : code|errmsg" + code +"|"+httpresp[2]);
+			success = false;
+		} else if (code == 200) {
+			Log.d(TAG1, "returned HTTP(in body) 200 : code|errmsg" + code +"|"+httpresp[2]);
+			success = true;
+		} else {
+			Log.d(TAG1, "returned strange HTTP(in body): code|errmsg" + code +"|"+httpresp[2]);
+			success = false;
+		}
+
+		// TBD modify to return different codes for successful and failed logins
+
+		String [] resp = null;
+		if ( success ){
+			resp[0] = "1";
+			resp[1] = httpresp[1];
+		} else {
+			resp[0] = "0";
+		}
+		
+		return resp;
+
+	}
+	
 
 }
 
