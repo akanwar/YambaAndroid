@@ -1,8 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference android:title="@string/titleUsername" android:key="Username" android:summary="@string/summaryUsername"/>
-    <EditTextPreference android:title="@string/titlePassword" android:key="Password" android:summary="@string/summaryPassword" android:password="true"/>
-    <EditTextPreference android:title="@string/titleCompany" android:key="Company" android:summary="@string/summaryCompany"/>
-    
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <EditTextPreference
+        android:key="Username"
+        android:summary="@string/summaryUsername"
+        android:title="@string/titleUsername" />
+    <EditTextPreference
+        android:key="Password"
+        android:password="true"
+        android:summary="@string/summaryPassword"
+        android:title="@string/titlePassword" />
+    <EditTextPreference
+        android:key="Company"
+        android:summary="@string/summaryCompany"
+        android:title="@string/titleCompany" />
+
+    <ListPreference
+        android:entries="@array/interval"
+        android:entryValues="@array/intervalValues"
+        android:key="interval"
+        android:summary="@string/summaryUpdaterInterval"
+        android:title="@string/titleUpdaterInterval" />
 
 </PreferenceScreen>

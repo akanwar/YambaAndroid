@@ -101,13 +101,13 @@ public class ColorLevelAdapter extends SimpleCursorAdapter { //
             	//C happened before c1
             	
             	String todays_Date = time_only_format.format(apiCalendarObject.getTime());
-            	Log.d(TAG, "time only format Date: " + todays_Date);
+            	//Log.d(TAG, "time only format Date: " + todays_Date);
             	textDate.setText(todays_Date);
             	
             } else {
             	//C1 happened before c
             	String nottodays_Date = date_only_format.format(apiCalendarObject.getTime());
-            	Log.d(TAG, "date only format todays Date: " + nottodays_Date);
+            	//Log.d(TAG, "date only format todays Date: " + nottodays_Date);
             	textDate.setText(nottodays_Date);
             }
             	

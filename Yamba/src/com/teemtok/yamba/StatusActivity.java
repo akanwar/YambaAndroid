@@ -91,13 +91,14 @@ public class StatusActivity extends Activity implements OnClickListener { //
     		Log.d(TAG, "Exception trying to login");
     	}
     	
+    	/*
    		if (!yamba.isServiceRunning()) {
 			startService(new Intent(this, UpdaterService.class)); //
 			Log.d(TAG, "Service started");
 		} else {
 			Log.d(TAG, "Service is already running");
 		}
-   		
+   		*/
  
     	
     }
@@ -136,17 +137,28 @@ public class StatusActivity extends Activity implements OnClickListener { //
     	case R.id.itemPrefs:
     		startActivity(new Intent(this, PrefsActivity.class)); //
     		break;
+    	case R.id.itemRefresh:
+    		startService(new Intent(this, UpdaterService2.class));
+    		break;
+    		/*
     	case R.id.itemServiceStart:
-    		if (!yamba.isServiceRunning()) {
+    		
+    		 if (!yamba.isServiceRunning()) {
+    		 
     			startService(new Intent(this, UpdaterService.class)); //
     			Log.d(TAG, "Service started");
     		} else {
     			Log.d(TAG, "Service is already running");
     		}
+    		Log.d(TAG, "Service start button is deprecated");
     		break;
     		case R.id.itemServiceStop:
+    		
     		stopService(new Intent(this, UpdaterService.class)); //
+    		
+        	Log.d(TAG, "Service stop button is deprecated");
     		break;
+    		*/
     	}
     	return true; //
     }

@@ -60,5 +60,28 @@
     <string name="textvalAckedList">ACK Comment</string>
     <string name="rowDatapoint">Data Point</string>
     <string name="title_activity_host_list">HostListActivity</string>
+    <string name="titleRefresh">Refresh</string>
+    <string name="summaryUpdaterInterval">Choose time interval to refresh data from server</string>
+    <string name="titleUpdaterInterval">Refresh Time</string>
+
+    <string-array name="interval">
+        <item>Never</item>
+        <item> 1 min - Testing</item>
+        <item>Fifteen minutes</item>
+        <item>Half hour</item>
+        <item>An hour</item>
+        <item>Half day</item>
+        <item>Day</item>
+    </string-array>
+    <!--  -->
+    <string-array name="intervalValues">
+        <item>0</item>
+        <item>60000</item>
+        <item>900000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+        <item>43200000</item>
+        <item>86400000</item>
+    </string-array>
 
 </resources>

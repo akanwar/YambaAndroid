@@ -38,76 +38,73 @@ public class LomoData { //
 			super(context, DB_NAME, null, DB_VERSION);
 		}
 
-		
-		boolean doesTableExist (SQLiteDatabase db) {
-			
-			String doesTableExistSQL = "SELECT count(name) as count FROM sqlite_master where name = '"+ TABLE+"'";
+		boolean doesTableExist(SQLiteDatabase db) {
+
+			String doesTableExistSQL = "SELECT count(name) as count FROM sqlite_master where name = '"
+					+ TABLE + "'";
 			Cursor c = db.rawQuery(doesTableExistSQL, null);
 			c.moveToFirst();
 			tableexists = c.getLong(c.getColumnIndex("count"));
 			c.close();
-			
+
 			Log.d(TAG, "Chexking on database: " + doesTableExistSQL);
-			Log.d(TAG, "table exists :" + tableexists );
-			
-			if ( tableexists == 0 ) { 
+			Log.d(TAG, "table exists :" + tableexists);
+
+			if (tableexists == 0) {
 				return false;
 			} else {
 				return true;
 			}
-			
-			
+
 		}
-		
+
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 
-			if ( !doesTableExist(db) ) { 
-			Log.d(TAG, "Creating database: " + DB_NAME);
-			String sql = "create table " + TABLE + " (" 
-					+ C_ID + " integer primary key, " 
-					+ C_DATAPOINT + " text, "
-					+ C_DATASOURCE + " text, "
-					+ C_DATASOURCEINSTANCE + " text, "
-					+ C_HOST + " text, "
-					+ C_LEVEL + " text, "
-					+ C_VALUE + " text, "
-					+ C_THRESHOLDS + " text, "
-					+ C_STARTONLOCALTIME + " text, "
-					+ C_STARTONUNIXTIME + " integer, "
-					+ C_ALERTID + " integer, " 
-					+ C_ISACKED + " integer, "
-					+ C_ACKCOMMENT + " text) ";
-			
-			try {
-				db.execSQL(sql); //
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				Log.d(TAG, "Table creation failed due to error in create table query!!");
-				//e.printStackTrace();
-			}
-			Log.d(TAG, "onCreated sql: " + sql);
+			if (!doesTableExist(db)) {
+				Log.d(TAG, "Creating database: " + DB_NAME);
+				String sql = "create table " + TABLE + " (" + C_ID
+						+ " integer primary key, " + C_DATAPOINT + " text, "
+						+ C_DATASOURCE + " text, " + C_DATASOURCEINSTANCE
+						+ " text, " + C_HOST + " text, " + C_LEVEL + " text, "
+						+ C_VALUE + " text, " + C_THRESHOLDS + " text, "
+						+ C_STARTONLOCALTIME + " text, " + C_STARTONUNIXTIME
+						+ " integer, " + C_ALERTID + " integer, " + C_ISACKED
+						+ " integer, " + C_ACKCOMMENT + " text) ";
+
+				try {
+					db.execSQL(sql); //
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					Log.d(TAG,
+							"Table creation failed due to error in create table query!!");
+					// e.printStackTrace();
+				}
+				Log.d(TAG, "onCreated sql: " + sql);
 			} else {
 				Log.d(TAG, "Table exists so skipping Create ");
 			}
-			
+
 		}
 
 		// Called whenever newVersion != oldVersion
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { //
 			final String TAG1 = TAG.concat("-onUpgrade");
-		// Typically do ALTER TABLE statements, but...we're just in development,
-		// so:
-			db.execSQL("drop table if exists " + TABLE); // drops the old database
+			// Typically do ALTER TABLE statements, but...we're just in
+			// development,
+			// so:
+			db.execSQL("drop table if exists " + TABLE); // drops the old
+															// database
 			Log.d(TAG1, "onUpgrade");
 			onCreate(db); // run onCreate to get new database
 		}
-		
-		public void purgeData (SQLiteDatabase db) { //:
+
+		public void purgeData(SQLiteDatabase db) { // :
 			final String TAG1 = TAG.concat("-purgeData");
-			//db.execSQL("drop table if exists " + TABLE); // drops the old database
-			if (  doesTableExist(db)) { 
+			// db.execSQL("drop table if exists " + TABLE); // drops the old
+			// database
+			if (doesTableExist(db)) {
 				db.delete(TABLE, null, null);
 			}
 			onCreate(db); // run onCreate to get new database
@@ -127,13 +124,13 @@ public class LomoData { //
 	}
 
 	public void insertOrIgnore(ContentValues values) { //
-		//Log.d(TAG, "insertOrIgnore");
+		// Log.d(TAG, "insertOrIgnore");
 		SQLiteDatabase db = this.dbHelper.getWritableDatabase(); //
 		try {
 			db.insertWithOnConflict(TABLE, null, values,
 					SQLiteDatabase.CONFLICT_IGNORE); //
 		} finally {
-			//db.close(); //
+			// db.close(); //
 		}
 	}
 
@@ -142,23 +139,31 @@ public class LomoData { //
 		return db.query(TABLE, null, null, null, null, null, GET_ALL_ORDER_BY);
 	}
 
-
-	public int getAlertCount(String level) { //
+	public synchronized int getAlertCount(String level) { //
 		SQLiteDatabase db = this.dbHelper.getReadableDatabase();
 		int ret = 0;
 
-		final String SQL_STATEMENT = "SELECT COUNT(*) FROM lomoalerts where level=?";
+		String SQL_STATEMENT = null;
+		String [] qparams = null;
+
+		if (level.equals("any")) {
+			SQL_STATEMENT = "SELECT COUNT(*) FROM lomoalerts";
+		} else {
+			SQL_STATEMENT = "SELECT COUNT(*) FROM lomoalerts where level=?";
+			qparams = new String[] { level };
+		}
 
 		try {
-			Cursor cursor = db.rawQuery(SQL_STATEMENT, new String[] { level });
+			Cursor cursor = db.rawQuery(SQL_STATEMENT, qparams);
 
 			try {
 				ret = cursor.moveToNext() ? cursor.getInt(0) : 0;
 			} finally {
 				cursor.close();
 			}
-		} finally {
-			//db.close();
+		} catch (Exception e) {
+			// db.close();
+			e.printStackTrace();
 		}
 
 		Log.d(TAG, "getAlertCount for level " + level + "returning " + ret);
@@ -166,14 +171,13 @@ public class LomoData { //
 		// query(TABLE, null, null, null, null, null, GET_ALL_ORDER_BY);
 	}
 
-
 	public void purgeDataBeforeInsert() { //
 		Log.d(TAG, "purgeDataBeforeInsert");
 		SQLiteDatabase db = this.dbHelper.getWritableDatabase(); //
 		try {
 			dbHelper.purgeData(db);
 		} finally {
-			//db.close(); //
+			// db.close(); //
 		}
 	}
 }
