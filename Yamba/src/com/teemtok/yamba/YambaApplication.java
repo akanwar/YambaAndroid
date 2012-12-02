@@ -23,10 +23,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlarmManager;
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -36,6 +43,7 @@ public class YambaApplication extends Application implements
 
 	private boolean serviceRunning;
 	private boolean loggedIn;
+	private boolean isAlarmFiring = false;
 
 	public static final int INTERVAL_NEVER = 0;
 	// private HttpClient httpclient = new DefaultHttpClient();
@@ -54,6 +62,9 @@ public class YambaApplication extends Application implements
 
 	private int totalalertcount_new = 0;
 	private int totalalertcount_prev = 0;
+
+	private NotificationManager notificationManager; //
+	private Notification notification;
 
 	private StringBuilder sb = null;
 
@@ -102,24 +113,32 @@ public class YambaApplication extends Application implements
 		}
 		return this.lomo;
 	}
-	
+
 	public synchronized int getInterval() { //
-		if (this.lomo == null) {
-			return this.prefs.getInt("interval", 0);		
-		} else {
-			return 0;
-		}
+		// if (this.lomo != null) {
+		String intstr = this.prefs.getString("interval", "0");
+		int interval = Integer.parseInt(intstr);
+		Log.d(TAG, "getInterval() got the interval as: " + interval);
+		return interval;
+		// } else {
+		// Log.d(TAG,
+		// "getInterval failed to get interval from prefs and returning 0");
+		// return 0;
+		// }
 
 	}
 
 	public synchronized void onSharedPreferenceChanged(
 			SharedPreferences sharedPreferences, String key) { //
-		this.lomo = null;
+		// this.lomo = null;
 
 		if (key.equals("interval")) {
 			Log.d(TAG, "Only interval changed, not logging in");
+			setAlarms(getApplicationContext());
+
 		} else {
 			Log.d(TAG, "logging in because you changed " + key);
+			this.lomo = null;
 			try {
 				LomoCredentials lomo1 = getLomoCredentials();
 				String ystatus = null;
@@ -204,10 +223,16 @@ public class YambaApplication extends Application implements
 			loggedIn = false;
 		}
 
+		if (loggedIn) {
+			// Send a intent to the service to start
+			setAlarms(getApplicationContext());
+		} else {
+			// no need to run the service
+			stopAlarms(getApplicationContext());
+		}
+
 		Log.d(TAG, "end of lomoLogin");
-
 		// TBD modify to return different codes for successful and failed logins
-
 		return httpresp[3];
 
 	}
@@ -322,7 +347,14 @@ public class YambaApplication extends Application implements
 		int httpcode = 0;
 
 		final String TAG1 = TAG.concat("-getLomoAlerts");
-
+		try {
+			Log.d(TAG1,
+					"before get lomo_GETALERTS_STRING: " + lomo.getCompany());
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			Log.d(TAG1, "excpetion for lomodata");
+			e1.printStackTrace();
+		}
 		// final String LOMO_GETALERTS_STRING =
 		// "http://citrix.logicmonitor.com/santaba/rpc/getAlerts";
 		final String LOMO_GETALERTS_STRING = "http://"
@@ -583,6 +615,109 @@ public class YambaApplication extends Application implements
 		} else {
 			return 0;
 		}
+	}
+
+	public boolean setAlarms(Context context) {
+
+		final String TAG1 = TAG.concat("-setAlarms");
+
+		// Check if we should do anything at boot at all
+
+		Log.d(TAG1, "Begin");
+		int interval = 0;
+		try {
+			interval = getInterval();
+			Log.d(TAG1, "Interval set to: " + interval);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Log.d(TAG, "Fail to get interval from yamba :" + interval);
+
+			e.printStackTrace();
+		}
+
+		if (interval == YambaApplication.INTERVAL_NEVER) //
+			return false;
+
+		Log.d(TAG, "verified that interval > 0 ");
+		// Create the pending intent
+
+		Intent intent = new Intent(context, UpdaterService2.class); //
+		PendingIntent pendingIntent = PendingIntent.getService(context, 0,
+				intent, PendingIntent.FLAG_UPDATE_CURRENT); //
+		// Setup alarm service to wake up and start service periodically
+		try {
+			AlarmManager alarmManager = (AlarmManager) context
+					.getSystemService(Context.ALARM_SERVICE); //
+			alarmManager.cancel(pendingIntent);
+			alarmManager.setInexactRepeating(
+					AlarmManager.ELAPSED_REALTIME_WAKEUP,
+					SystemClock.elapsedRealtime(), interval, pendingIntent); //
+			Log.d(TAG1, "Setting alarm succeeded");
+			// alarmManager.get
+			isAlarmFiring = true;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Log.d(TAG1, "Setting alarm failed, your service may not work");
+			isAlarmFiring = false;
+			e.printStackTrace();
+		}
+
+		Log.d(TAG1, "End");
+		return true;
+	}
+
+	public boolean stopAlarms(Context context) {
+
+		final String TAG1 = TAG.concat("-stopAlarms");
+
+		// Check if we should do anything at boot at all
+
+		Log.d(TAG1, "Begin");
+
+		Intent intent = new Intent(context, UpdaterService2.class); //
+		PendingIntent pendingIntent = PendingIntent.getService(context, 0,
+				intent, PendingIntent.FLAG_UPDATE_CURRENT); //
+		// Setup alarm service to wake up and start service periodically
+		try {
+			AlarmManager alarmManager = (AlarmManager) context
+					.getSystemService(Context.ALARM_SERVICE); //
+			alarmManager.cancel(pendingIntent);
+
+			Log.d(TAG1, "Stopping alarm succeeded");
+			isAlarmFiring = false;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Log.d(TAG1, "Stopping alarm failed, your service may not work");
+			isAlarmFiring = true;
+			e.printStackTrace();
+		}
+
+		Log.d(TAG1, "End");
+		return true;
+	}
+
+	public void sendAlertNotification(int numNewAlerts) {
+		Log.d(TAG, "sendAlertNotification begin ");
+
+		Context c = getApplicationContext();
+		this.notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE); //
+		this.notification = new Notification(
+				R.drawable.lomoalertsicon, "", 0);
+
+		PendingIntent pendingIntent = PendingIntent.getActivity(c, -1,
+				new Intent(c, AlertActivity.class),
+				PendingIntent.FLAG_UPDATE_CURRENT); //
+
+		this.notification.when = SystemClock.elapsedRealtime(); //
+		this.notification.flags |= Notification.FLAG_AUTO_CANCEL; //
+		CharSequence notificationTitle = this
+				.getText(R.string.msgNotificationTitle); //
+		CharSequence notificationSummary = this.getString(
+				R.string.msgNotificationMessage, numNewAlerts);
+		this.notification.setLatestEventInfo(this, notificationTitle,
+				notificationSummary, pendingIntent); //
+		this.notificationManager.notify(0, this.notification);
+		Log.d(TAG, "sendAlertNotification- done");
 	}
 
 }

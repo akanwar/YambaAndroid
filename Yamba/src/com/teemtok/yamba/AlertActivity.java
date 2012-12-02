@@ -4,7 +4,10 @@ import com.teemtok.yamba.PullToRefreshListView;
 import com.teemtok.yamba.PullToRefreshListView.OnRefreshListener;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -28,16 +31,17 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 	SQLiteDatabase db;
 	Cursor cursor; //
 	PullToRefreshListView listView; //
-	SimpleCursorAdapter adapter; //
+	//SimpleCursorAdapter adapter; //
 	Button textwarnCount;
 	Button texterrorCount;
 	Button textcriticalCount;
-	
+	AlertReceiver receiver;
+	IntentFilter alertAutoRefreshFilter;
 	ColorLevelAdapter colorAdapter;
 
 	private YambaApplication yamba;
 	private static final String TAG = AlertActivity.class.getSimpleName();
-
+	static final String SEND_TIMELINE_NOTIFICATIONS = "com.teemtok.yamba.SEND_ALERT_NOTIFICATIONS";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +56,8 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		textwarnCount.setOnClickListener(this);
 		texterrorCount.setOnClickListener(this);
 		textcriticalCount.setOnClickListener(this);
+		receiver = new AlertReceiver();
+		alertAutoRefreshFilter = new IntentFilter("com.teemtok.yamba.NEW_ALERT");
 
 		listView = (PullToRefreshListView) findViewById(R.id.listAlerts);
 		
@@ -87,6 +93,13 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 	
 
 	@Override
+	public void onPause() {
+		super.onPause();
+		super.unregisterReceiver(receiver);
+		Log.d(TAG, "in OnPause");
+	}
+	
+	@Override
 	public void onStop() {
 		super.onStop();
 		Log.d(TAG, "in OnStop");
@@ -106,6 +119,8 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		super.onResume();
 		try {
 			refreshAlertData("any");
+			super.registerReceiver(receiver, alertAutoRefreshFilter,
+					SEND_TIMELINE_NOTIFICATIONS, null);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -172,6 +187,17 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
     	
     	}
 
+	}
+	
+	
+	class AlertReceiver extends BroadcastReceiver { //
+		@Override
+		public void onReceive(Context context, Intent intent) { //
+			//cursor.requery(); //
+			refreshAlertData("any");
+			colorAdapter.notifyDataSetChanged(); //
+			Log.d(TAG, "onReceived New Alerts from updaterservice2, doing self refresh");
+		}
 	}
 
 

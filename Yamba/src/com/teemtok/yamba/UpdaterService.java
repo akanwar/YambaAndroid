@@ -2,6 +2,7 @@ package com.teemtok.yamba;
 
 import android.app.Service;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
@@ -32,7 +33,7 @@ public class UpdaterService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		this.yamba = (YambaApplication) getApplication();
-		this.updater = new Updater(); //
+		//this.updater = new Updater(); //
 		Log.d(TAG, "onCreated");
 	
 	}
@@ -40,25 +41,36 @@ public class UpdaterService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
-		this.runFlag = true; //
-		this.updater.start();
-		this.yamba.setServiceRunning(true);
-		Log.d(TAG, "onStarted");
+		//this.runFlag = true; //
+		//this.updater.start();
+		//this.yamba.setServiceRunning(true);
+		Log.d(TAG, "onStartCommand");
 
 		return START_STICKY;
+	}
+	
+	@Override
+	public void onStart(Intent intent, int startId) {
+
+		//this.runFlag = true; //
+		//this.updater.start();
+		//this.yamba.setServiceRunning(true);
+		Log.d(TAG, "onStart");
+
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		this.runFlag = false; //
-		this.updater.interrupt(); //
-		this.updater = null;
-		this.yamba.setServiceRunning(false);
+		//this.runFlag = false; //
+		//this.updater.interrupt(); //
+		//this.updater = null;
+		//this.yamba.setServiceRunning(false);
 		Log.d(TAG, "onDestroyed Service");
 		
 	}
-
+	
+	
 	 // Thread that performs the actual update from the online service
 	private class Updater extends Thread { //
 		public Updater() {

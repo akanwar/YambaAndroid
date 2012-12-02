@@ -63,25 +63,31 @@
     <string name="titleRefresh">Refresh</string>
     <string name="summaryUpdaterInterval">Choose time interval to refresh data from server</string>
     <string name="titleUpdaterInterval">Refresh Time</string>
+    <string name="send_alert_notifications_permission_description">Generate Alerts Description</string>
+    <string name="receive_alert_notifications_permission_description">Receive Alerts description</string>
+    <string name="receive_alert_notifications_permission_label">Receive Alerts</string>
+    <string name="send_alert_notifications_permission_label">Genrate Alerts</string>
+    <string name="msgNotificationTitle">Logicmonitor Alerts</string>
+    <string name="msgNotificationMessage">click to see new alerts</string>
 
     <string-array name="interval">
         <item>Never</item>
-        <item> 1 min - Testing</item>
+        <item>One minute</item>
+        <item>Five minutes</item>
+        <item>Ten minutes</item>
         <item>Fifteen minutes</item>
         <item>Half hour</item>
         <item>An hour</item>
-        <item>Half day</item>
-        <item>Day</item>
     </string-array>
     <!--  -->
     <string-array name="intervalValues">
         <item>0</item>
         <item>60000</item>
+        <item>300000</item>
+        <item>600000</item>
         <item>900000</item>
         <item>1800000</item>
         <item>3600000</item>
-        <item>43200000</item>
-        <item>86400000</item>
     </string-array>
 
 </resources>

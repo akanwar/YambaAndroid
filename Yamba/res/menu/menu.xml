@@ -7,7 +7,7 @@
         android:title="@string/titlePrefs">
     </item>
 
-    <!--
+   
     <item android:title="@string/titleServiceStart" 
         android:id="@+id/itemServiceStart" 
         android:icon="@android:drawable/ic_media_play">
@@ -16,12 +16,13 @@
 	    android:id="@+id/itemServiceStop" 
 	    android:icon="@android:drawable/ic_media_pause">
 	</item>
-    -->
-
+  
+<!-- 
     <item
         android:id="@+id/itemRefresh"
         android:icon="@android:drawable/ic_menu_rotate"
         android:title="@string/titleRefresh">
     </item>
+-->
 
 </menu>

@@ -17,7 +17,6 @@
             android:label="@string/title_activity_status" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -28,6 +27,11 @@
         <receiver android:name=".BootReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".NetworkReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
 
@@ -49,15 +53,36 @@
         <activity
             android:name=".HostListActivity"
             android:label="@string/title_activity_host_list" >
+            <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            -->
         </activity>
+   
+        
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <permission
+        android:name="com.marakana.yamba.SEND_ALERT_NOTIFICATIONS"
+        android:description="@string/send_alert_notifications_permission_description"
+        android:label="@string/send_alert_notifications_permission_label"
+        android:permissionGroup="android.permission-group.PERSONAL_INFO"
+        android:protectionLevel="normal" />
+    <permission
+        android:name="com.marakana.yamba.RECEIVE_ALERT_NOTIFICATIONS"
+        android:description="@string/receive_alert_notifications_permission_description"
+        android:label="@string/receive_alert_notifications_permission_label"
+        android:permissionGroup="android.permission-group.PERSONAL_INFO"
+        android:protectionLevel="normal" />
+    <!--  -->
+    <uses-permission android:name="com.teemtok.yamba.SEND_ALERT_NOTIFICATIONS" />
+    <uses-permission android:name="com.teemtok.yamba.RECEIVE_ALERT_NOTIFICATIONS" />
 
 </manifest>

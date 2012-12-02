@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -53,127 +54,103 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 public class StatusActivity extends Activity implements OnClickListener { //
 
-	
 	private static final String TAG = "StatusActivity";
-    //EditText editText;
-    Button updateButton, hostButton;
-    SharedPreferences prefs;
-    YambaApplication yamba;
-    
-    
-    /** Called when the activity is first created. */
-    
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-    	super.onCreate(savedInstanceState);
-    	setContentView(R.layout.activity_status);
-    
-    	// Find views
-    	//editText = (EditText) findViewById(R.id.editText); //
-    	updateButton = (Button) findViewById(R.id.buttonUpdate);
-    	updateButton.setOnClickListener(this); 
-    	
-    	hostButton = (Button) findViewById(R.id.idbuttonListHosts);
-    	hostButton.setOnClickListener(this); 
-    	
-    	
-    	try {
-    		yamba = ((YambaApplication) getApplication()); //
-    		LomoCredentials lomo1 = yamba.getLomoCredentials();
-    		String ystatus = null;
-			if ( lomo1 != null) { ystatus = yamba.lomoLogin(lomo1); }
+	// EditText editText;
+	Button updateButton, hostButton;
+	SharedPreferences prefs;
+	YambaApplication yamba;
+
+	/** Called when the activity is first created. */
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_status);
+
+		// Find views
+		// editText = (EditText) findViewById(R.id.editText); //
+		updateButton = (Button) findViewById(R.id.buttonUpdate);
+		updateButton.setOnClickListener(this);
+
+		hostButton = (Button) findViewById(R.id.idbuttonListHosts);
+		hostButton.setOnClickListener(this);
+
+		try {
+			yamba = ((YambaApplication) getApplication()); //
+			LomoCredentials lomo1 = yamba.getLomoCredentials();
+			String ystatus = null;
+			if (lomo1 != null) {
+				ystatus = yamba.lomoLogin(lomo1);
+			}
 			Log.d(TAG, "ystatus is " + ystatus);
-			
-    	} catch (Exception e) {
-    		Log.d(TAG, "Exception trying to login");
-    	}
-    	
-    	/*
-   		if (!yamba.isServiceRunning()) {
-			startService(new Intent(this, UpdaterService.class)); //
-			Log.d(TAG, "Service started");
-		} else {
-			Log.d(TAG, "Service is already running");
+
+		} catch (Exception e) {
+			Log.d(TAG, "Exception trying to login");
 		}
-   		*/
- 
-    	
-    }
-    
-    // Called when button is clicked
-    public void onClick(View v) {
-   		
-	   	switch ( v.getId()) { //
-    	case R.id.buttonUpdate:
-       		Log.d(TAG, "onClicked Starting Alerts Activity");
-       		startActivity(new Intent(this, AlertActivity.class));
-    		break;
-    	case R.id.idbuttonListHosts:
-       		Log.d(TAG, "onClicked Starting Host List Activity");
-       		startActivity(new Intent(this, HostListActivity.class));
-    		break;
-    	default:
-			Log.d(TAG,"onClick called with default" + v.getId());
-    		break;
-    	
-    	}
-   		
-   	}    	
-    	
-    	
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-    	MenuInflater inflater = getMenuInflater(); //
-    	inflater.inflate(R.menu.menu, menu); //
-    	return true;
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-    	switch (item.getItemId()) { //
-    	case R.id.itemPrefs:
-    		startActivity(new Intent(this, PrefsActivity.class)); //
-    		break;
-    	case R.id.itemRefresh:
-    		startService(new Intent(this, UpdaterService2.class));
-    		break;
-    		/*
-    	case R.id.itemServiceStart:
-    		
-    		 if (!yamba.isServiceRunning()) {
-    		 
-    			startService(new Intent(this, UpdaterService.class)); //
-    			Log.d(TAG, "Service started");
-    		} else {
-    			Log.d(TAG, "Service is already running");
-    		}
-    		Log.d(TAG, "Service start button is deprecated");
-    		break;
-    		case R.id.itemServiceStop:
-    		
-    		stopService(new Intent(this, UpdaterService.class)); //
-    		
-        	Log.d(TAG, "Service stop button is deprecated");
-    		break;
-    		*/
-    	}
-    	return true; //
-    }
-    
-    public void onStop(View v) {
-    	// TBD never seems to get called.
-    	// httpclient.getConnectionManager().shutdown();
-    	Log.d(TAG,"httpclient destroyed");
-    }
-    
-    
-    
-    
+
+		/*
+		 * if (!yamba.isServiceRunning()) { startService(new Intent(this,
+		 * UpdaterService.class)); // Log.d(TAG, "Service started"); } else {
+		 * Log.d(TAG, "Service is already running"); }
+		 */
+
+	}
+
+	// Called when button is clicked
+	public void onClick(View v) {
+
+		switch (v.getId()) { //
+		case R.id.buttonUpdate:
+			Log.d(TAG, "onClicked Starting Alerts Activity");
+			startActivity(new Intent(this, AlertActivity.class));
+			break;
+		case R.id.idbuttonListHosts:
+			Log.d(TAG, "onClicked Starting Host List Activity");
+			startActivity(new Intent(this, HostListActivity.class));
+			break;
+		default:
+			Log.d(TAG, "onClick called with default" + v.getId());
+			break;
+
+		}
+
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater(); //
+		inflater.inflate(R.menu.menu, menu); //
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		Context context1 = getApplicationContext();
+
+		switch (item.getItemId()) { //
+		case R.id.itemPrefs:
+			startActivity(new Intent(this, PrefsActivity.class)); //
+			break;
+		case R.id.itemServiceStart:
+			yamba.setAlarms(context1);
+			Log.d(TAG, "Service started check - adb shell dumpsys alarm");
+			break;
+		case R.id.itemServiceStop:
+			yamba.stopAlarms(context1);
+			Log.d(TAG, "Service stoped check - adb shell dumpsys alarm");
+			break;
+
+		}
+		return true; //
+	}
+
+	public void onStop(View v) {
+		// TBD never seems to get called.
+		// httpclient.getConnectionManager().shutdown();
+		Log.d(TAG, "httpclient destroyed");
+	}
+
 }
-
-
-
-
