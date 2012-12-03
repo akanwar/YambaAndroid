@@ -31,18 +31,19 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 	SQLiteDatabase db;
 	Cursor cursor; //
 	PullToRefreshListView listView; //
-	//SimpleCursorAdapter adapter; //
+	// SimpleCursorAdapter adapter; //
 	Button textwarnCount;
 	Button texterrorCount;
 	Button textcriticalCount;
 	AlertReceiver receiver;
 	IntentFilter alertAutoRefreshFilter;
 	ColorLevelAdapter colorAdapter;
+	TextView alertsRefreshRTextView;
 
 	private YambaApplication yamba;
 	private static final String TAG = AlertActivity.class.getSimpleName();
 	static final String SEND_TIMELINE_NOTIFICATIONS = "com.teemtok.yamba.SEND_ALERT_NOTIFICATIONS";
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -52,7 +53,7 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		textwarnCount = (Button) findViewById(R.id.textWarnCount);
 		texterrorCount = (Button) findViewById(R.id.textErrorCount);
 		textcriticalCount = (Button) findViewById(R.id.textCriticalCount);
-
+		alertsRefreshRTextView = (TextView) findViewById(R.id.idalert_activity_lastAlertsRefreshTime);
 		textwarnCount.setOnClickListener(this);
 		texterrorCount.setOnClickListener(this);
 		textcriticalCount.setOnClickListener(this);
@@ -60,7 +61,7 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		alertAutoRefreshFilter = new IntentFilter("com.teemtok.yamba.NEW_ALERT");
 
 		listView = (PullToRefreshListView) findViewById(R.id.listAlerts);
-		
+
 		listView.setOnRefreshListener(new OnRefreshListener() {
 
 			@Override
@@ -71,7 +72,6 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 				listView.onRefreshComplete();
 			}
 		});
-		
 
 		listView.setOnItemClickListener(this);
 
@@ -81,16 +81,15 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		db = dbHelper.getReadableDatabase();
 		this.yamba = (YambaApplication) getApplication();
 	}
-	
+
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-			// TODO Auto-generated method stub
-		Log.d(TAG, "You clicked on view : "+ arg1.getId() + " position : " + arg2 + " and id : " + arg3);
+		// TODO Auto-generated method stub
+		Log.d(TAG, "You clicked on view : " + arg1.getId() + " position : " + arg2 + " and id : " + arg3);
 		Intent myIntent = new Intent(this, AlertDetailActivity.class);
 		myIntent.putExtra("primarykey", arg3);
 		startActivity(myIntent);
 	}
-	
 
 	@Override
 	public void onPause() {
@@ -98,7 +97,7 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		super.unregisterReceiver(receiver);
 		Log.d(TAG, "in OnPause");
 	}
-	
+
 	@Override
 	public void onStop() {
 		super.onStop();
@@ -119,16 +118,17 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		super.onResume();
 		try {
 			refreshAlertData("any");
-			super.registerReceiver(receiver, alertAutoRefreshFilter,
-					SEND_TIMELINE_NOTIFICATIONS, null);
+			super.registerReceiver(receiver, alertAutoRefreshFilter, SEND_TIMELINE_NOTIFICATIONS, null);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		alertsRefreshRTextView.setText("Alerts updated: ".concat(yamba.getLastrefreshTimeString()));
 	}
 
 	private void refreshAlertData(String filterlevel) {
-	
+
 		// Get the data from the database
 		try {
 			if (filterlevel.equals("critical")) {
@@ -142,9 +142,9 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 				Log.d(TAG, "filterlevel warn");
 			} else {
 				cursor = db.query(DbHelper.TABLE, null, null, null, null, null, DbHelper.C_STARTONUNIXTIME + " DESC");
-				Log.d(TAG, "filterlevel is "+ filterlevel);
-			}	
-			
+				Log.d(TAG, "filterlevel is " + filterlevel);
+			}
+
 		} catch (SQLiteException e) {
 			Log.d(TAG, "SQLiteException in refreshAlertData");
 			// e.printStackTrace();
@@ -170,36 +170,33 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 
 	public void onClick(View v) {
 		Log.d(TAG, "onClicked Level Count button in Alerts Activity" + v.getId());
-			
-	   	switch ( v.getId()) { //
-    	case R.id.textCriticalCount:
+
+		switch (v.getId()) { //
+		case R.id.textCriticalCount:
 			refreshAlertData("critical");
-    		break;
-    	case R.id.textErrorCount:
+			break;
+		case R.id.textErrorCount:
 			refreshAlertData("error");
-    		break;
-    	case R.id.textWarnCount:
+			break;
+		case R.id.textWarnCount:
 			refreshAlertData("warn");
-    		break;
-    	default:
-			Log.d(TAG,"onClick called with default");
-    		break;
-    	
-    	}
+			break;
+		default:
+			Log.d(TAG, "onClick called with default");
+			break;
+
+		}
 
 	}
-	
-	
+
 	class AlertReceiver extends BroadcastReceiver { //
 		@Override
 		public void onReceive(Context context, Intent intent) { //
-			//cursor.requery(); //
+			// cursor.requery(); //
 			refreshAlertData("any");
 			colorAdapter.notifyDataSetChanged(); //
 			Log.d(TAG, "onReceived New Alerts from updaterservice2, doing self refresh");
 		}
 	}
 
-
-	
 }

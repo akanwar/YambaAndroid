@@ -9,7 +9,8 @@
 
     <application
         android:name=".YambaApplication"
-        android:icon="@drawable/ic_launcher"
+        android:allowBackup="true"
+        android:icon="@drawable/sphere1lm1"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
@@ -53,16 +54,13 @@
         <activity
             android:name=".HostListActivity"
             android:label="@string/title_activity_host_list" >
+
             <!--
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             -->
         </activity>
-   
-        
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -81,7 +79,7 @@
         android:label="@string/receive_alert_notifications_permission_label"
         android:permissionGroup="android.permission-group.PERSONAL_INFO"
         android:protectionLevel="normal" />
-    <!--  -->
+
     <uses-permission android:name="com.teemtok.yamba.SEND_ALERT_NOTIFICATIONS" />
     <uses-permission android:name="com.teemtok.yamba.RECEIVE_ALERT_NOTIFICATIONS" />
 

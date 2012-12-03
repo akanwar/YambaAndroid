@@ -1,9 +1,9 @@
 <resources>
 
-    <string name="app_name">LogicMonitorAlerts</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">Logic Monitor Alerts</string>
+    <string name="hello_world">Logic Monitor</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_status"></string>
+    <string name="title_activity_status">LMAlerts</string>
     <string name="hintText">Status Window hint</string>
     <string name="titleStatus">Logic Monitor</string>
     <string name="buttonUpdate">Alerts</string>
@@ -69,6 +69,10 @@
     <string name="send_alert_notifications_permission_label">Genrate Alerts</string>
     <string name="msgNotificationTitle">Logicmonitor Alerts</string>
     <string name="msgNotificationMessage">click to see new alerts</string>
+    <string name="popupTitle">Need To Login!</string>
+    <string name="buttonDismiss">Login Now</string>
+    <string name="lastAlertsRefreshTime">Last Alerts Retrieved at</string>
+    <string name="textLoggedinstatus">Logged in status</string>
 
     <string-array name="interval">
         <item>Never</item>

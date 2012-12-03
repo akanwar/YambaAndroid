@@ -1,36 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Main Layout of Status Activity -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
-    android:orientation="vertical" 
-    android:layout_width="fill_parent" 
-    android:layout_height="fill_parent">
-<!-- Title TextView-->
-<TextView android:layout_width="fill_parent"
-    android:layout_height="wrap_content" 
-    android:gravity="center"
-    android:textSize="30sp"
-    android:layout_margin="10dp"
-    android:text="@string/titleStatus"/>
-<!-- 
-<EditText android:layout_width="fill_parent"
-    android:layout_height="0dip"
-    android:layout_weight="1"
-    android:hint="@string/hintText" 
-    android:id="@+id/editText"
-    android:gravity="top|center_horizontal"></EditText>
-    -->
-<!-- Update Button -->
-<Button android:layout_width="fill_parent"
-    android:layout_height="wrap_content" 
-    android:text="@string/buttonUpdate"
-    android:textSize="20sp" 
-    android:id="@+id/buttonUpdate"></Button>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-<Button android:layout_width="fill_parent"
-    android:layout_height="wrap_content" 
-    android:text="@string/buttonListHosts"
-    android:textSize="20sp" 
-    android:id="@+id/idbuttonListHosts"></Button>
+    <!-- Title TextView -->
 
+    <RelativeLayout
+        android:id="@+id/status_activity_footer"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="5dip"
+        android:background="#eeeeee"
+        android:orientation="vertical" >
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/imageViewIsLoggedIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:layout_marginRight="15dip"
+            android:src="@drawable/greencheck" />
+
+        <LinearLayout
+            android:id="@+id/insidetxtforfooter"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dip"
+            android:layout_toLeftOf="@+id/imageViewIsLoggedIn"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/idLoggedinstatus"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:text="@string/textLoggedinstatus" />
+
+            <TextView
+                android:id="@+id/idlastAlertsRefreshTime"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:text="@string/lastAlertsRefreshTime" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/status_activity_top"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
+
+        <!--
+        <TextView
+            android:id="@+id/idtitleStatus"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:text="@string/titleStatus"
+            android:textSize="30sp" />
+        -->
+
+        <ImageView
+            android:id="@+id/imageViewIsLogo"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:gravity="center"
+            android:src="@drawable/lms5" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/status_activity_buttons"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/status_activity_footer" >
+
+        <Button
+            android:id="@+id/buttonUpdate"
+            style="@style/ButtonText"
+            android:layout_width="fill_parent"
+            android:layout_height="150dip"
+            android:layout_weight="1"
+            android:background="@drawable/button_green"
+            android:text="@string/buttonUpdate"
+            android:textSize="20sp" >
+        </Button>
+
+        <Button
+            android:id="@+id/idbuttonListHosts"
+            style="@style/ButtonText"
+            android:layout_width="fill_parent"
+            android:layout_height="150dip"
+            android:layout_weight="1"
+            android:background="@drawable/button_green"
+            android:text="@string/buttonListHosts"
+            android:textSize="20sp" >
+        </Button>
+    </LinearLayout>
+
+</RelativeLayout>

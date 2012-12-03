@@ -3,6 +3,10 @@ package com.teemtok.yamba;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 //import org.json.JSONArray;
 //import org.json.JSONException;
@@ -67,6 +71,7 @@ public class YambaApplication extends Application implements
 	private Notification notification;
 
 	private StringBuilder sb = null;
+	SimpleDateFormat apiformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
 	// private JSONObject jsonLomoAlertsOuterObject;
 
@@ -178,27 +183,6 @@ public class YambaApplication extends Application implements
 		Log.d(TAG, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status"
 				+ httpresp[0] + "|" + httpresp[1].length() + "|" + httpresp[2]
 				+ "|" + httpresp[3]);
-
-		/*
-		 * HttpClient httpclient = new DefaultHttpClient();
-		 * 
-		 * HttpGet httpget = new HttpGet(loginURL);
-		 * 
-		 * HttpResponse response = null; try {
-		 * 
-		 * response = httpclient.execute(httpget, localContext);
-		 * //httpclient.getConnectionManager().shutdown(); } catch
-		 * (ClientProtocolException e) { Log.d(TAG,
-		 * "ClientProtocolException encountered."); e.printStackTrace(); } catch
-		 * (Exception e) { Log.d(TAG, "Login Exception encountered.");
-		 * e.printStackTrace(); }
-		 * 
-		 * String status = response.getStatusLine().toString();
-		 * 
-		 * 
-		 * int code = response.getStatusLine().getStatusCode();
-		 */
-
 		code = Integer.parseInt(httpresp[3]);
 		httpcode = Integer.parseInt(httpresp[0]);
 
@@ -401,6 +385,8 @@ public class YambaApplication extends Application implements
 				totalalertcount_new = lomodata.getAlertCount("any");
 				Log.d(TAG1, "prev alerts | new alerts" + totalalertcount_prev
 						+ "|" + totalalertcount_new);
+				final Calendar apiCalendarObjectGetAlerts = Calendar.getInstance();
+				setLastrefreshTime(apiCalendarObjectGetAlerts.getTime());
 
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -719,5 +705,63 @@ public class YambaApplication extends Application implements
 		this.notificationManager.notify(0, this.notification);
 		Log.d(TAG, "sendAlertNotification- done");
 	}
+	
+	public void setLastrefreshTime(Date dateTime) {
+		String time = null;
+		try {
+			time = apiformat.format(dateTime);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Log.d(TAG,"-setLastrefreshTime: apiformat fro calkendar onject failed");
+			e.printStackTrace();
+		}
+		final String PREFS_NAME = "MyPrefsFile";
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+	      SharedPreferences.Editor editor = settings.edit();
+	      editor.putString("lastUpdateTime", time);
+	      // Commit the edits!
+	      editor.commit();
+	}
+	
+	public String getLastrefreshTimeString() {
+		final String PREFS_NAME = "MyPrefsFile";
+		SharedPreferences settings = null;
+		try {
+			settings = getSharedPreferences(PREFS_NAME, 0);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Log.d(TAG,"-getLastrefreshTimeString: read from prefs failed");
+			e.printStackTrace();
+		}
+	    //String returntime = settings.getString("lastUpdateTime","1970-01-01 00:00:00 PST");
+	    String returntime = settings.getString("lastUpdateTime","a long time ago.");
+
+	    return returntime;
+	}
+	
+	public Date getLastrefreshTimeCalendar() {
+		final Calendar apiCalendarObject = Calendar.getInstance();
+		final String PREFS_NAME = "MyPrefsFile";
+		SharedPreferences settings = null;
+		try {
+			settings = getSharedPreferences(PREFS_NAME, 0);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			Log.d(TAG,"-getLastrefreshTimeCalendar: read from prefs failed");
+			e1.printStackTrace();
+		}
+	    String returntime = settings.getString("lastUpdateTime","1970-01-01 00:00:00 PST");
+	    try {
+			apiCalendarObject.setTime(apiformat.parse(returntime));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			Log.d(TAG,"-getLastrefreshTimeCalendar: setTime on calendar object failed");
+			e.printStackTrace();
+		}
+	    return apiCalendarObject.getTime();
+	}
+
+
+	
 
 }

@@ -12,13 +12,18 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.ViewPager.LayoutParams;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 //import android.app.Activity;
 import android.view.Menu;
@@ -59,8 +64,14 @@ public class StatusActivity extends Activity implements OnClickListener { //
 	private static final String TAG = "StatusActivity";
 	// EditText editText;
 	Button updateButton, hostButton;
+	TextView alertsRefreshRTextView, loggedinStatus;
 	SharedPreferences prefs;
 	YambaApplication yamba;
+	//
+	ImageView loggedinImg;
+	PopupWindow popupWindow;
+	LayoutInflater layoutInflater;
+	View popupView;
 
 	/** Called when the activity is first created. */
 
@@ -73,9 +84,15 @@ public class StatusActivity extends Activity implements OnClickListener { //
 		// editText = (EditText) findViewById(R.id.editText); //
 		updateButton = (Button) findViewById(R.id.buttonUpdate);
 		updateButton.setOnClickListener(this);
-
+		alertsRefreshRTextView = (TextView) findViewById(R.id.idlastAlertsRefreshTime);
+		loggedinStatus = (TextView) findViewById(R.id.idLoggedinstatus);
 		hostButton = (Button) findViewById(R.id.idbuttonListHosts);
 		hostButton.setOnClickListener(this);
+		loggedinImg = (ImageView) findViewById(R.id.imageViewIsLoggedIn);
+
+		layoutInflater = (LayoutInflater) getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+		popupView = layoutInflater.inflate(R.layout.login_popup, null);
+		popupWindow = new PopupWindow(popupView, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
 		try {
 			yamba = ((YambaApplication) getApplication()); //
@@ -89,13 +106,61 @@ public class StatusActivity extends Activity implements OnClickListener { //
 		} catch (Exception e) {
 			Log.d(TAG, "Exception trying to login");
 		}
+	}
 
-		/*
-		 * if (!yamba.isServiceRunning()) { startService(new Intent(this,
-		 * UpdaterService.class)); // Log.d(TAG, "Service started"); } else {
-		 * Log.d(TAG, "Service is already running"); }
-		 */
+	@Override
+	public void onResume() {
+		super.onResume();
 
+		alertsRefreshRTextView.setText("Last update: ".concat(yamba.getLastrefreshTimeString()));
+
+		if (yamba.isloggedIn()) {
+			if (popupWindow.isShowing()) {
+				popupWindow.dismiss();
+			}
+			loggedinImg.setImageResource(R.drawable.greencheck);
+			loggedinStatus.setText("Logged in as : " + yamba.getLomoCredentials().getUsername());
+		} else {
+			loggedinImg.setImageResource(R.drawable.redexclamation);
+			loggedinStatus.setText("Not logged in.");
+		}
+		//
+
+		findViewById(R.id.imageViewIsLogo).post(new Runnable() {
+			public void run() {
+				if (popWindowPaint()) {
+					Log.d(TAG, "Succesfully painted the login pop-up from onResume");
+				} else {
+					Log.d(TAG, "Could not paint the login pop-up from onResume");
+				}
+			}
+		});
+
+	}
+
+	boolean popWindowPaint() {
+		boolean success = false;
+		try {
+			if (!yamba.isloggedIn()) {
+				popupWindow.showAtLocation(hostButton, 1, 0, 0);
+				Button btnDismiss = (Button) popupView.findViewById(R.id.iddismiss);
+				success = true;
+				btnDismiss.setOnClickListener(new Button.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						popupWindow.dismiss();
+						startActivity(new Intent(getApplicationContext(), PrefsActivity.class));
+					}
+				});
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Log.d(TAG, "painting pop up window failed");
+			e.printStackTrace();
+			success = false;
+		}
+		return success;
 	}
 
 	// Called when button is clicked

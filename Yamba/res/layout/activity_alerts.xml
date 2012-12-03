@@ -1,39 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="fill_parent"
     android:orientation="vertical" >
 
     <!-- Title -->
 
     <LinearLayout
+        android:id="@+id/alert_activity_bottom"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" >
+
+        <TextView
+            android:id="@+id/idalert_activity_lastAlertsRefreshTime"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/lastAlertsRefreshTime" 
+            android:background="#eeeeee"
+            android:layout_marginTop="5dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/alert_activity_top"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" >
 
         <Button
             android:id="@+id/textCriticalCount"
+            style="@style/ButtonText"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:layout_weight="1"
             android:background="@drawable/button_red"
             android:gravity="center"
-            android:text="@string/rowCriticalCount" 
-			style="@style/ButtonText"/>
+            android:text="@string/rowCriticalCount" />
 
         <Button
             android:id="@+id/textErrorCount"
+            style="@style/ButtonText"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:layout_weight="1"
             android:background="@drawable/button_orange"
             android:gravity="center"
-            android:text="@string/rowErrorCount"             
-            style="@style/ButtonText"/>
+            android:text="@string/rowErrorCount" />
 
         <Button
             android:id="@+id/textWarnCount"
+            style="@style/ButtonText"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
@@ -41,15 +60,21 @@
             android:background="@drawable/button_yellow"
             android:gravity="center"
             android:shadowColor="@android:color/darker_gray"
-            android:text="@string/rowWarnCount" 
-            style="@style/ButtonText"/>
-
+            android:text="@string/rowWarnCount" />
     </LinearLayout>
     <!-- android:background="#FFFF00" -->
 
-    <com.teemtok.yamba.PullToRefreshListView
-        android:id="@+id/listAlerts"
+    <LinearLayout
+        android:id="@+id/alert_activity_middle"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"/>
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/alert_activity_bottom"
+        android:layout_below="@+id/alert_activity_top" >
 
-</LinearLayout>
+        <com.teemtok.yamba.PullToRefreshListView
+            android:id="@+id/listAlerts"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+    </LinearLayout>
+
+</RelativeLayout>
