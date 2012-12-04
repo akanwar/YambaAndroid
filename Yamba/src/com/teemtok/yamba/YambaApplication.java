@@ -41,9 +41,9 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
-public class YambaApplication extends Application implements
-		OnSharedPreferenceChangeListener { //
+public class YambaApplication extends Application implements OnSharedPreferenceChangeListener { //
 
 	private boolean serviceRunning;
 	private boolean loggedIn;
@@ -111,10 +111,9 @@ public class YambaApplication extends Application implements
 			String password = this.prefs.getString("Password", "");
 			String company = this.prefs.getString("Company", "");
 
-			if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)
-					&& !TextUtils.isEmpty(company)) {
+			if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password) && !TextUtils.isEmpty(company)) {
 				this.lomo = new LomoCredentials(username, password, company);
-			}
+			} 
 		}
 		return this.lomo;
 	}
@@ -133,10 +132,12 @@ public class YambaApplication extends Application implements
 
 	}
 
-	public synchronized void onSharedPreferenceChanged(
-			SharedPreferences sharedPreferences, String key) { //
+	public synchronized void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) { //
 		// this.lomo = null;
-
+		int duration = Toast.LENGTH_LONG;
+		CharSequence testSuccessLogin = "Login Successful!";
+		Toast toast;
+		CharSequence textFailedLogin = "Login Failed!";
 		if (key.equals("interval")) {
 			Log.d(TAG, "Only interval changed, not logging in");
 			setAlarms(getApplicationContext());
@@ -149,6 +150,15 @@ public class YambaApplication extends Application implements
 				String ystatus = null;
 				if (lomo1 != null) {
 					ystatus = lomoLogin(lomo1);
+					if(isloggedIn()) {
+						Log.d(TAG,"-onSharedPreferenceChanged Staring Service!");
+						setAlarms(getApplicationContext());
+						toast = Toast.makeText(getApplicationContext(), testSuccessLogin, duration);
+						toast.show();
+					} else {
+						toast = Toast.makeText(getApplicationContext(), textFailedLogin, duration);
+						toast.show();
+					} 					
 				}
 				Log.d(TAG, "End of preference change : " + ystatus);
 
@@ -165,13 +175,10 @@ public class YambaApplication extends Application implements
 		int httpcode;
 
 		// public static final String LOMO_URL_STRING =
-		// "http://citrix.logicmonitor.com/santaba/rpc/signIn?c=citrix&u=apiuser&p=helloworld";
+		// "https://citrix.logicmonitor.com/santaba/rpc/signIn?c=citrix&u=apiuser&p=helloworld";
 
-		String loginURL = "http://".concat(lomo.getCompany())
-				.concat(".logicmonitor.com/santaba/rpc/signIn?c=")
-				.concat(lomo.getCompany()).concat("&u=")
-				.concat(lomo.getUsername()).concat("&p=")
-				.concat(lomo.getPassword());
+		String loginURL = "https://".concat(lomo.getCompany()).concat(".logicmonitor.com/santaba/rpc/signIn?c=").concat(lomo.getCompany())
+				.concat("&u=").concat(lomo.getUsername()).concat("&p=").concat(lomo.getPassword());
 		Log.d(TAG, "beginning of lomologin" + loginURL);
 
 		localContext.removeAttribute(ClientContext.COOKIE_STORE);
@@ -180,9 +187,8 @@ public class YambaApplication extends Application implements
 
 		String[] httpresp = executeHTTPwithStatus(loginURL);
 
-		Log.d(TAG, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status"
-				+ httpresp[0] + "|" + httpresp[1].length() + "|" + httpresp[2]
-				+ "|" + httpresp[3]);
+		Log.d(TAG, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status" + httpresp[0] + "|" + httpresp[1].length() + "|" + httpresp[2] + "|"
+				+ httpresp[3]);
 		code = Integer.parseInt(httpresp[3]);
 		httpcode = Integer.parseInt(httpresp[0]);
 
@@ -193,20 +199,16 @@ public class YambaApplication extends Application implements
 		}
 
 		if (code >= 400 && code < 500) {
-			Log.d(TAG,
-					"returned HTTP(in body) between 400 and 500 : code|errmsg"
-							+ code + "|" + httpresp[2]);
+			Log.d(TAG, "returned HTTP(in body) between 400 and 500 : code|errmsg" + code + "|" + httpresp[2]);
 			loggedIn = false;
 		} else if (code == 200) {
-			Log.d(TAG, "returned HTTP(in body) 200 : code|errmsg" + code + "|"
-					+ httpresp[2]);
+			Log.d(TAG, "returned HTTP(in body) 200 : code|errmsg" + code + "|" + httpresp[2]);
 			loggedIn = true;
 		} else {
-			Log.d(TAG, "returned strange HTTP(in body): code|errmsg" + code
-					+ "|" + httpresp[2]);
+			Log.d(TAG, "returned strange HTTP(in body): code|errmsg" + code + "|" + httpresp[2]);
 			loggedIn = false;
 		}
-
+/*
 		if (loggedIn) {
 			// Send a intent to the service to start
 			setAlarms(getApplicationContext());
@@ -214,7 +216,7 @@ public class YambaApplication extends Application implements
 			// no need to run the service
 			stopAlarms(getApplicationContext());
 		}
-
+*/
 		Log.d(TAG, "end of lomoLogin");
 		// TBD modify to return different codes for successful and failed logins
 		return httpresp[3];
@@ -255,8 +257,7 @@ public class YambaApplication extends Application implements
 				InputStream instream = entitylocal.getContent();
 				try {
 
-					BufferedReader reader = new BufferedReader(
-							new InputStreamReader(instream));
+					BufferedReader reader = new BufferedReader(new InputStreamReader(instream));
 
 					sblocal = new StringBuilder();
 
@@ -265,10 +266,7 @@ public class YambaApplication extends Application implements
 						sblocal.append(line + "\n");
 						// Log.d(TAG1, line);
 					}
-					Log.d(TAG1,
-							"First 100 chars of the response are: "
-									+ sblocal.substring(0,
-											Math.min(sblocal.length(), 100)));
+					Log.d(TAG1, "First 100 chars of the response are: " + sblocal.substring(0, Math.min(sblocal.length(), 100)));
 				} catch (Exception ex) {
 					throw ex;
 				} finally {
@@ -281,8 +279,7 @@ public class YambaApplication extends Application implements
 			Log.d(TAG1, "ClientProtocolException encountered.");
 			e.printStackTrace();
 		} catch (Exception e) {
-			Log.d(TAG1, "Http GET Exception encountered."
-					+ responselocal.getStatusLine().toString());
+			Log.d(TAG1, "Http GET Exception encountered." + responselocal.getStatusLine().toString());
 			e.printStackTrace();
 		}
 
@@ -332,24 +329,20 @@ public class YambaApplication extends Application implements
 
 		final String TAG1 = TAG.concat("-getLomoAlerts");
 		try {
-			Log.d(TAG1,
-					"before get lomo_GETALERTS_STRING: " + lomo.getCompany());
+			Log.d(TAG1, "before get lomo_GETALERTS_STRING: " + lomo.getCompany());
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			Log.d(TAG1, "excpetion for lomodata");
 			e1.printStackTrace();
 		}
 		// final String LOMO_GETALERTS_STRING =
-		// "http://citrix.logicmonitor.com/santaba/rpc/getAlerts";
-		final String LOMO_GETALERTS_STRING = "http://"
-				.concat(lomo.getCompany()).concat(
-						".logicmonitor.com/santaba/rpc/getAlerts");
+		// "https://citrix.logicmonitor.com/santaba/rpc/getAlerts";
+		final String LOMO_GETALERTS_STRING = "https://".concat(lomo.getCompany()).concat(".logicmonitor.com/santaba/rpc/getAlerts");
 		Log.d(TAG1, "beginning of Lomo Alerts URL is: " + LOMO_GETALERTS_STRING);
 
 		String[] httpresp = executeHTTPwithStatus(LOMO_GETALERTS_STRING);
-		Log.d(TAG1, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status"
-				+ httpresp[0] + "|" + httpresp[1].length() + "|" + httpresp[2]
-				+ "|" + httpresp[3]);
+		Log.d(TAG1, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status" + httpresp[0] + "|" + httpresp[1].length() + "|" + httpresp[2] + "|"
+				+ httpresp[3]);
 		code = Integer.parseInt(httpresp[3]);
 		httpcode = Integer.parseInt(httpresp[0]);
 		if (httpcode == 200) {
@@ -359,17 +352,13 @@ public class YambaApplication extends Application implements
 		}
 
 		if (code >= 400 && code < 500) {
-			Log.d(TAG1,
-					"returned HTTP(in body) between 400 and 500 : code|errmsg"
-							+ code + "|" + httpresp[2]);
+			Log.d(TAG1, "returned HTTP(in body) between 400 and 500 : code|errmsg" + code + "|" + httpresp[2]);
 			success = false;
 		} else if (code == 200) {
-			Log.d(TAG1, "returned HTTP(in body) 200 : code|errmsg" + code + "|"
-					+ httpresp[2]);
+			Log.d(TAG1, "returned HTTP(in body) 200 : code|errmsg" + code + "|" + httpresp[2]);
 			success = true;
 		} else {
-			Log.d(TAG1, "returned strange HTTP(in body): code|errmsg" + code
-					+ "|" + httpresp[2]);
+			Log.d(TAG1, "returned strange HTTP(in body): code|errmsg" + code + "|" + httpresp[2]);
 			success = false;
 		}
 
@@ -383,8 +372,7 @@ public class YambaApplication extends Application implements
 				totalalertcount_prev = totalalertcount_new;
 				parseJSONandUpdateDB();
 				totalalertcount_new = lomodata.getAlertCount("any");
-				Log.d(TAG1, "prev alerts | new alerts" + totalalertcount_prev
-						+ "|" + totalalertcount_new);
+				Log.d(TAG1, "prev alerts | new alerts" + totalalertcount_prev + "|" + totalalertcount_new);
 				final Calendar apiCalendarObjectGetAlerts = Calendar.getInstance();
 				setLastrefreshTime(apiCalendarObjectGetAlerts.getTime());
 
@@ -411,32 +399,25 @@ public class YambaApplication extends Application implements
 			jsonLomoAlertsOuterObject = new JSONObject(alertString);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			Log.d(TAG1,
-					"Root JSON object (jsonLomoAlertsOuterObject) creation failed: "
-							+ jsonLomoAlertsOuterObject);
+			Log.d(TAG1, "Root JSON object (jsonLomoAlertsOuterObject) creation failed: " + jsonLomoAlertsOuterObject);
 		}
 
 		try {
 			responsestatus = jsonLomoAlertsOuterObject.getString("status");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			Log.d(TAG1, "Read on response status from JSON object failed: "
-					+ responsestatus);
+			Log.d(TAG1, "Read on response status from JSON object failed: " + responsestatus);
 		}
 
 		try {
 			alertsrootobject = jsonLomoAlertsOuterObject.getJSONObject("data");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			Log.d(TAG1,
-					"creation of JSON object for DATA (alertsrootobject) failed: "
-							+ alertsrootobject);
+			Log.d(TAG1, "creation of JSON object for DATA (alertsrootobject) failed: " + alertsrootobject);
 		}
 		int totalerts = alertsrootobject.getInt("total");
 		JSONArray alertsobject = alertsrootobject.getJSONArray("alerts");
-		Log.d(TAG1, "NUM ALERTS: " + totalerts + "   RESPONSE STATUS: "
-				+ responsestatus + "  LENGTH ALERTOBJECT ARRAY: "
-				+ alertsobject.length());
+		Log.d(TAG1, "NUM ALERTS: " + totalerts + "   RESPONSE STATUS: " + responsestatus + "  LENGTH ALERTOBJECT ARRAY: " + alertsobject.length());
 
 		ContentValues values = new ContentValues();
 		criticalCount = 0;
@@ -446,35 +427,23 @@ public class YambaApplication extends Application implements
 		for (i = 0; i < alertsobject.length(); i++) {
 			values.clear();
 			alertLevel = alertsobject.getJSONObject(i).getString("level");
-			values.put(LomoData.C_DATAPOINT, alertsobject.getJSONObject(i)
-					.getString("dataPoint"));
-			values.put(LomoData.C_DATASOURCE, alertsobject.getJSONObject(i)
-					.getString("dataSource"));
-			values.put(LomoData.C_DATASOURCEINSTANCE, alertsobject
-					.getJSONObject(i).getString("dataSourceInstance"));
-			values.put(LomoData.C_HOST, alertsobject.getJSONObject(i)
-					.getString("host"));
-			values.put(LomoData.C_LEVEL, alertsobject.getJSONObject(i)
-					.getString("level"));
-			values.put(LomoData.C_VALUE, alertsobject.getJSONObject(i)
-					.getString("value"));
-			values.put(LomoData.C_THRESHOLDS, alertsobject.getJSONObject(i)
-					.getString("thresholds"));
-			values.put(LomoData.C_STARTONLOCALTIME,
-					alertsobject.getJSONObject(i).getString("startOnLocal"));
-			values.put(LomoData.C_STARTONUNIXTIME, alertsobject
-					.getJSONObject(i).getString("startOn"));
-			values.put(LomoData.C_ALERTID, alertsobject.getJSONObject(i)
-					.getInt("id"));
-			boolean isackedFlag = alertsobject.getJSONObject(i).getBoolean(
-					"acked");
+			values.put(LomoData.C_DATAPOINT, alertsobject.getJSONObject(i).getString("dataPoint"));
+			values.put(LomoData.C_DATASOURCE, alertsobject.getJSONObject(i).getString("dataSource"));
+			values.put(LomoData.C_DATASOURCEINSTANCE, alertsobject.getJSONObject(i).getString("dataSourceInstance"));
+			values.put(LomoData.C_HOST, alertsobject.getJSONObject(i).getString("host"));
+			values.put(LomoData.C_LEVEL, alertsobject.getJSONObject(i).getString("level"));
+			values.put(LomoData.C_VALUE, alertsobject.getJSONObject(i).getString("value"));
+			values.put(LomoData.C_THRESHOLDS, alertsobject.getJSONObject(i).getString("thresholds"));
+			values.put(LomoData.C_STARTONLOCALTIME, alertsobject.getJSONObject(i).getString("startOnLocal"));
+			values.put(LomoData.C_STARTONUNIXTIME, alertsobject.getJSONObject(i).getString("startOn"));
+			values.put(LomoData.C_ALERTID, alertsobject.getJSONObject(i).getInt("id"));
+			boolean isackedFlag = alertsobject.getJSONObject(i).getBoolean("acked");
 			if (isackedFlag) {
 				values.put(LomoData.C_ISACKED, 1);
 			} else {
 				values.put(LomoData.C_ISACKED, 0);
 			}
-			values.put(LomoData.C_ACKCOMMENT, alertsobject.getJSONObject(i)
-					.getString("ackComment").replaceAll("\n", ""));
+			values.put(LomoData.C_ACKCOMMENT, alertsobject.getJSONObject(i).getString("ackComment").replaceAll("\n", ""));
 			lomodata.insertOrIgnore(values);
 
 		}
@@ -504,9 +473,8 @@ public class YambaApplication extends Application implements
 		Log.d(TAG1, "Reached Yamba pushing ACK, URL is: " + URL);
 
 		String[] httpresp = executeHTTPwithStatus(URL);
-		Log.d(TAG1, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status"
-				+ httpresp[0] + "|" + httpresp[1].length() + "|" + httpresp[2]
-				+ "|" + httpresp[3]);
+		Log.d(TAG1, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status" + httpresp[0] + "|" + httpresp[1].length() + "|" + httpresp[2] + "|"
+				+ httpresp[3]);
 
 		code = Integer.parseInt(httpresp[3]);
 		httpcode = Integer.parseInt(httpresp[0]);
@@ -518,17 +486,13 @@ public class YambaApplication extends Application implements
 		}
 
 		if (code >= 400 && code < 500) {
-			Log.d(TAG1,
-					"returned HTTP(in body) between 400 and 500 : code|errmsg"
-							+ code + "|" + httpresp[2]);
+			Log.d(TAG1, "returned HTTP(in body) between 400 and 500 : code|errmsg" + code + "|" + httpresp[2]);
 			success = false;
 		} else if (code == 200) {
-			Log.d(TAG1, "returned HTTP(in body) 200 : code|errmsg" + code + "|"
-					+ httpresp[2]);
+			Log.d(TAG1, "returned HTTP(in body) 200 : code|errmsg" + code + "|" + httpresp[2]);
 			success = true;
 		} else {
-			Log.d(TAG1, "returned strange HTTP(in body): code|errmsg" + code
-					+ "|" + httpresp[2]);
+			Log.d(TAG1, "returned strange HTTP(in body): code|errmsg" + code + "|" + httpresp[2]);
 			success = false;
 		}
 
@@ -548,14 +512,11 @@ public class YambaApplication extends Application implements
 
 		final String TAG1 = TAG.concat("-getHostGroups");
 
-		final String LOMO_GETHOSTGROUPS_STRING = "http://".concat(
-				lomo.getCompany()).concat(
-				".logicmonitor.com/santaba/rpc/getHostGroups");
+		final String LOMO_GETHOSTGROUPS_STRING = "https://".concat(lomo.getCompany()).concat(".logicmonitor.com/santaba/rpc/getHostGroups");
 
 		String[] httpresp = executeHTTPwithStatus(LOMO_GETHOSTGROUPS_STRING);
-		Log.d(TAG1, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status"
-				+ httpresp[0] + "|" + httpresp[1].length() + "|" + httpresp[2]
-				+ "|" + httpresp[3]);
+		Log.d(TAG1, "httpresp array HTTPSTATUS|sizeofresponse|errormsg|status" + httpresp[0] + "|" + httpresp[1].length() + "|" + httpresp[2] + "|"
+				+ httpresp[3]);
 
 		code = Integer.parseInt(httpresp[3]);
 		httpcode = Integer.parseInt(httpresp[0]);
@@ -567,17 +528,13 @@ public class YambaApplication extends Application implements
 		}
 
 		if (code >= 400 && code < 500) {
-			Log.d(TAG1,
-					"returned HTTP(in body) between 400 and 500 : code|errmsg"
-							+ code + "|" + httpresp[2]);
+			Log.d(TAG1, "returned HTTP(in body) between 400 and 500 : code|errmsg" + code + "|" + httpresp[2]);
 			success = false;
 		} else if (code == 200) {
-			Log.d(TAG1, "returned HTTP(in body) 200 : code|errmsg" + code + "|"
-					+ httpresp[2]);
+			Log.d(TAG1, "returned HTTP(in body) 200 : code|errmsg" + code + "|" + httpresp[2]);
 			success = true;
 		} else {
-			Log.d(TAG1, "returned strange HTTP(in body): code|errmsg" + code
-					+ "|" + httpresp[2]);
+			Log.d(TAG1, "returned strange HTTP(in body): code|errmsg" + code + "|" + httpresp[2]);
 			success = false;
 		}
 
@@ -628,16 +585,12 @@ public class YambaApplication extends Application implements
 		// Create the pending intent
 
 		Intent intent = new Intent(context, UpdaterService2.class); //
-		PendingIntent pendingIntent = PendingIntent.getService(context, 0,
-				intent, PendingIntent.FLAG_UPDATE_CURRENT); //
+		PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT); //
 		// Setup alarm service to wake up and start service periodically
 		try {
-			AlarmManager alarmManager = (AlarmManager) context
-					.getSystemService(Context.ALARM_SERVICE); //
+			AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE); //
 			alarmManager.cancel(pendingIntent);
-			alarmManager.setInexactRepeating(
-					AlarmManager.ELAPSED_REALTIME_WAKEUP,
-					SystemClock.elapsedRealtime(), interval, pendingIntent); //
+			alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent); //
 			Log.d(TAG1, "Setting alarm succeeded");
 			// alarmManager.get
 			isAlarmFiring = true;
@@ -661,12 +614,10 @@ public class YambaApplication extends Application implements
 		Log.d(TAG1, "Begin");
 
 		Intent intent = new Intent(context, UpdaterService2.class); //
-		PendingIntent pendingIntent = PendingIntent.getService(context, 0,
-				intent, PendingIntent.FLAG_UPDATE_CURRENT); //
+		PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT); //
 		// Setup alarm service to wake up and start service periodically
 		try {
-			AlarmManager alarmManager = (AlarmManager) context
-					.getSystemService(Context.ALARM_SERVICE); //
+			AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE); //
 			alarmManager.cancel(pendingIntent);
 
 			Log.d(TAG1, "Stopping alarm succeeded");
@@ -687,42 +638,38 @@ public class YambaApplication extends Application implements
 
 		Context c = getApplicationContext();
 		this.notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE); //
-		this.notification = new Notification(
-				R.drawable.lomoalertsicon, "", 0);
+		long now = System.currentTimeMillis();
+		//Date myDate = new Date();
+		this.notification = new Notification(R.drawable.lomoalertsicon, "You have ".concat(Integer.toString(numNewAlerts)).concat(" new alerts!"), now);
 
-		PendingIntent pendingIntent = PendingIntent.getActivity(c, -1,
-				new Intent(c, AlertActivity.class),
-				PendingIntent.FLAG_UPDATE_CURRENT); //
+		PendingIntent pendingIntent = PendingIntent.getActivity(c, -1, new Intent(c, AlertActivity.class), PendingIntent.FLAG_UPDATE_CURRENT); //
 
-		this.notification.when = SystemClock.elapsedRealtime(); //
+		//this.notification.when = SystemClock.elapsedRealtime(); //
 		this.notification.flags |= Notification.FLAG_AUTO_CANCEL; //
-		CharSequence notificationTitle = this
-				.getText(R.string.msgNotificationTitle); //
-		CharSequence notificationSummary = this.getString(
-				R.string.msgNotificationMessage, numNewAlerts);
-		this.notification.setLatestEventInfo(this, notificationTitle,
-				notificationSummary, pendingIntent); //
+		CharSequence notificationTitle = this.getText(R.string.msgNotificationTitle); //
+		CharSequence notificationSummary = this.getString(R.string.msgNotificationMessage, numNewAlerts);
+		this.notification.setLatestEventInfo(this, notificationTitle, notificationSummary, pendingIntent); //
 		this.notificationManager.notify(0, this.notification);
-		Log.d(TAG, "sendAlertNotification- done");
+		Log.d(TAG, "sendAlertNotification - done");
 	}
-	
+
 	public void setLastrefreshTime(Date dateTime) {
 		String time = null;
 		try {
 			time = apiformat.format(dateTime);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			Log.d(TAG,"-setLastrefreshTime: apiformat fro calkendar onject failed");
+			Log.d(TAG, "-setLastrefreshTime: apiformat fro calkendar onject failed");
 			e.printStackTrace();
 		}
 		final String PREFS_NAME = "MyPrefsFile";
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-	      SharedPreferences.Editor editor = settings.edit();
-	      editor.putString("lastUpdateTime", time);
-	      // Commit the edits!
-	      editor.commit();
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("lastUpdateTime", time);
+		// Commit the edits!
+		editor.commit();
 	}
-	
+
 	public String getLastrefreshTimeString() {
 		final String PREFS_NAME = "MyPrefsFile";
 		SharedPreferences settings = null;
@@ -730,15 +677,16 @@ public class YambaApplication extends Application implements
 			settings = getSharedPreferences(PREFS_NAME, 0);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			Log.d(TAG,"-getLastrefreshTimeString: read from prefs failed");
+			Log.d(TAG, "-getLastrefreshTimeString: read from prefs failed");
 			e.printStackTrace();
 		}
-	    //String returntime = settings.getString("lastUpdateTime","1970-01-01 00:00:00 PST");
-	    String returntime = settings.getString("lastUpdateTime","a long time ago.");
+		// String returntime =
+		// settings.getString("lastUpdateTime","1970-01-01 00:00:00 PST");
+		String returntime = settings.getString("lastUpdateTime", "a long time ago.");
 
-	    return returntime;
+		return returntime;
 	}
-	
+
 	public Date getLastrefreshTimeCalendar() {
 		final Calendar apiCalendarObject = Calendar.getInstance();
 		final String PREFS_NAME = "MyPrefsFile";
@@ -747,21 +695,18 @@ public class YambaApplication extends Application implements
 			settings = getSharedPreferences(PREFS_NAME, 0);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			Log.d(TAG,"-getLastrefreshTimeCalendar: read from prefs failed");
+			Log.d(TAG, "-getLastrefreshTimeCalendar: read from prefs failed");
 			e1.printStackTrace();
 		}
-	    String returntime = settings.getString("lastUpdateTime","1970-01-01 00:00:00 PST");
-	    try {
+		String returntime = settings.getString("lastUpdateTime", "1970-01-01 00:00:00 PST");
+		try {
 			apiCalendarObject.setTime(apiformat.parse(returntime));
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
-			Log.d(TAG,"-getLastrefreshTimeCalendar: setTime on calendar object failed");
+			Log.d(TAG, "-getLastrefreshTimeCalendar: setTime on calendar object failed");
 			e.printStackTrace();
 		}
-	    return apiCalendarObject.getTime();
+		return apiCalendarObject.getTime();
 	}
-
-
-	
 
 }

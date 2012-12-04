@@ -126,12 +126,15 @@ public class LomoData { //
 	public void insertOrIgnore(ContentValues values) { //
 		// Log.d(TAG, "insertOrIgnore");
 		SQLiteDatabase db = this.dbHelper.getWritableDatabase(); //
-		try {
-			db.insertWithOnConflict(TABLE, null, values,
-					SQLiteDatabase.CONFLICT_IGNORE); //
-		} finally {
-			// db.close(); //
-		}
+			try {
+				db.insertWithOnConflict(TABLE, null, values,
+						SQLiteDatabase.CONFLICT_IGNORE);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				Log.d(TAG, "-insertOrIgnore: Database insert failed");
+				e.printStackTrace();
+			} //
+
 	}
 
 	public Cursor getStatusUpdates() { //

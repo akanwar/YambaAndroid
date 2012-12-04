@@ -49,15 +49,15 @@ public class UpdaterService2 extends IntentService {
 					Log.d(TAG, "Yamba Alerts call successfull");
 					int numNewAlerts = yamba.anynewalerts();
 					if (numNewAlerts > 0) {
-						Log.d(TAG, "We have a new alerts !");
+						Log.d(TAG, "We have a new alerts ! numalerts is " + numNewAlerts);
 						intent = new Intent(NEW_ALERT_INTENT);
 						intent.putExtra(NEW_ALERT_EXTRA_COUNT, numNewAlerts);
 						sendBroadcast(intent, RECEIVE_ALERT_NOTIFICATIONS);
 						yamba.sendAlertNotification(numNewAlerts);
 					}
 				} else {
-
-					Log.d(TAG, "Yamba Alerts call unsuccessfull");
+					yamba.setloggedIn(false);
+					Log.d(TAG, "Yamba Alerts call unsuccessfull");				
 				}
 
 			} else {
@@ -69,7 +69,7 @@ public class UpdaterService2 extends IntentService {
 					ystatus = yamba.lomoLogin(lomo1);
 				} else {
 					Log.d(TAG,
-							"lomo credemtials are null please enter username pwd");
+							"lomo credemtials are null please enter username pwd or company");
 				}
 
 				if (!yamba.isloggedIn()) {

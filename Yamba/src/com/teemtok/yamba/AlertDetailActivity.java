@@ -230,7 +230,7 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 
 		// String ackComment = editAckText.getText().toString().replaceAll(" ",
 		// "+");
-		String LOMO_ACK_STRING = "http://citrix.logicmonitor.com/santaba/rpc/confirmAlerts?ids="
+		String LOMO_ACK_STRING = "https://".concat(yamba.getLomoCredentials().getCompany()).concat(".logicmonitor.com/santaba/rpc/confirmAlerts?ids=")
 				.concat(idvalalertid
 						.getText()
 						.toString()

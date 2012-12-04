@@ -11,15 +11,21 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +48,7 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 
 	private YambaApplication yamba;
 	private static final String TAG = AlertActivity.class.getSimpleName();
-	static final String SEND_TIMELINE_NOTIFICATIONS = "com.teemtok.yamba.SEND_ALERT_NOTIFICATIONS";
+	static final String SEND_ALERT_NOTIFICATIONS = "com.teemtok.yamba.SEND_ALERT_NOTIFICATIONS";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -74,12 +80,20 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		});
 
 		listView.setOnItemClickListener(this);
+		
 
 		// Connect to database
 
 		dbHelper = new DbHelper(this);
 		db = dbHelper.getReadableDatabase();
 		this.yamba = (YambaApplication) getApplication();
+		
+		
+		findViewById(R.id.textCriticalCount).post(new Runnable() {
+			public void run() {
+				showPopup(AlertActivity.this);
+			}
+		});
 	}
 
 	@Override
@@ -118,7 +132,7 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		super.onResume();
 		try {
 			refreshAlertData("any");
-			super.registerReceiver(receiver, alertAutoRefreshFilter, SEND_TIMELINE_NOTIFICATIONS, null);
+			super.registerReceiver(receiver, alertAutoRefreshFilter, SEND_ALERT_NOTIFICATIONS, null);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -188,6 +202,50 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		}
 
 	}
+	
+	
+	
+	
+	private void showPopup(final Activity context) {
+			   int popupWidth = 200;
+			   int popupHeight = 150;
+			   //int y = (textcriticalCount.getLeft()+ textcriticalCount.getRight())/2;
+			   int x = textcriticalCount.getLeft()+textcriticalCount.getWidth();
+			   int y = textcriticalCount.getTop()+textcriticalCount.getHeight();
+			   
+			   // Inflate the popup_layout.xml
+			   LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.popup);
+			   LayoutInflater layoutInflater = (LayoutInflater) context
+			     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			   View layout = layoutInflater.inflate(R.layout.bubble_layout, viewGroup);
+			 
+			   // Creating the PopupWindow
+			   final PopupWindow popup = new PopupWindow(context);
+			   popup.setContentView(layout);
+			   popup.setWidth(popupWidth);
+			   popup.setHeight(popupHeight);
+			   popup.setFocusable(true);
+			 
+			   // Some offset to align the popup a bit to the right, and a bit down, relative to button's position.
+			   int OFFSET_X = 30;
+			   int OFFSET_Y = 30;
+			 
+			   // Clear the default translucent background
+			   popup.setBackgroundDrawable(new BitmapDrawable());
+			 
+			   // Displaying the popup at the specified location, + offsets.
+			   popup.showAtLocation(layout, Gravity.NO_GRAVITY, x, y);
+			 
+			   // Getting a reference to Close button, and close the popup when clicked.
+			   Button close = (Button) layout.findViewById(R.id.close);
+			   close.setOnClickListener(new OnClickListener() {
+			 
+			     @Override
+			     public void onClick(View v) {
+			       popup.dismiss();
+			     }
+			   });
+			}
 
 	class AlertReceiver extends BroadcastReceiver { //
 		@Override
