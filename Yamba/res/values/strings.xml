@@ -73,6 +73,8 @@
     <string name="buttonDismiss">Login Now</string>
     <string name="lastAlertsRefreshTime">Last Alerts Retrieved at</string>
     <string name="textLoggedinstatus">Logged in status</string>
+    <string name="textBubble">Click one of the three buttons to filter to that alert level. \n\n\n Pull down main area to refresh.</string>
+       <string name="textBubblebutton">OK</string> 
 
     <string-array name="interval">
         <item>Never</item>

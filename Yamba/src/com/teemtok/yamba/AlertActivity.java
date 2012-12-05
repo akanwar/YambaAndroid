@@ -207,14 +207,18 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 	
 	
 	private void showPopup(final Activity context) {
-			   int popupWidth = 200;
-			   int popupHeight = 150;
+			   int popupWidth = 400;
+			   int popupHeight = 280;
 			   //int y = (textcriticalCount.getLeft()+ textcriticalCount.getRight())/2;
-			   int x = textcriticalCount.getLeft()+textcriticalCount.getWidth();
-			   int y = textcriticalCount.getTop()+textcriticalCount.getHeight();
+			   
+			   LinearLayout l = (LinearLayout) context.findViewById(R.id.alert_activity_middle);
+			   int x = l.getLeft();
+			   int y = l.getTop()+75;
+			   
+			   Log.d(TAG, " alert_activity_middle coordinates" + x + " " + y);
 			   
 			   // Inflate the popup_layout.xml
-			   LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.popup);
+			   LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.idHelpPopup);
 			   LayoutInflater layoutInflater = (LayoutInflater) context
 			     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			   View layout = layoutInflater.inflate(R.layout.bubble_layout, viewGroup);
@@ -234,8 +238,10 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 			   popup.setBackgroundDrawable(new BitmapDrawable());
 			 
 			   // Displaying the popup at the specified location, + offsets.
-			   popup.showAtLocation(layout, Gravity.NO_GRAVITY, x, y);
-			 
+			   popup.showAtLocation(layout, Gravity.TOP, 0,y);
+			   
+			   
+
 			   // Getting a reference to Close button, and close the popup when clicked.
 			   Button close = (Button) layout.findViewById(R.id.close);
 			   close.setOnClickListener(new OnClickListener() {
@@ -245,6 +251,7 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 			       popup.dismiss();
 			     }
 			   });
+
 			}
 
 	class AlertReceiver extends BroadcastReceiver { //

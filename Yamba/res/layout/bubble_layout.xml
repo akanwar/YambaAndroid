@@ -1,31 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	   android:layout_width="wrap_content"
-	   android:id="@+id/popup"
-	   android:layout_height="wrap_content"
-	   android:background="@drawable/bubble"
-	   android:orientation="vertical" >
-	 
-	<TextView
-	   android:id="@+id/textView1"
-	   android:layout_width="wrap_content"
-	   android:layout_height="wrap_content"
-	   android:text="Lomo Buddy"
-	   android:textAppearance="?android:attr/textAppearanceLarge" />
-	 
-	<TextView
-	   android:id="@+id/textView2"
-	   android:layout_marginTop="5dp"
-	   android:layout_width="wrap_content"
-	   android:layout_height="wrap_content"
-	   android:text="Pull to Refresh" />
-	 
-	<Button
-	   android:id="@+id/close"
-	   android:layout_marginTop="10dp"
-	   android:layout_gravity="center_horizontal"
-	   android:layout_width="wrap_content"
-	   android:layout_height="wrap_content"
-	   android:text="Close" />
-	 
-	</LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/idHelpPopup"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" 
+            android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/popup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/helpbubble3"
+ >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@+string/textBubble"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+                        android:layout_alignParentRight="true"
+            android:background="@drawable/button_black"
+            android:text="@+string/textBubblebutton"
+            android:textColor="#ffffff" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/idDownArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dip"
+        android:layout_marginRight="15dip"
+        android:src="@drawable/ptr_pulltorefresh_arrow"
+         android:layout_alignParentBottom="true"
+         android:layout_centerInParent="true"/>
+
+</RelativeLayout>
