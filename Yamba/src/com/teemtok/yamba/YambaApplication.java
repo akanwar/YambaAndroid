@@ -72,6 +72,9 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 
 	private StringBuilder sb = null;
 	SimpleDateFormat apiformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+	
+	final String PREFS_NAME = "MyPrefsFile";
+	
 
 	// private JSONObject jsonLomoAlertsOuterObject;
 
@@ -374,7 +377,7 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 				totalalertcount_new = lomodata.getAlertCount("any");
 				Log.d(TAG1, "prev alerts | new alerts" + totalalertcount_prev + "|" + totalalertcount_new);
 				final Calendar apiCalendarObjectGetAlerts = Calendar.getInstance();
-				setLastrefreshTime(apiCalendarObjectGetAlerts.getTime());
+				setPrefs(apiCalendarObjectGetAlerts.getTime(), "lastUpdateTime");
 
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -653,7 +656,7 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 		Log.d(TAG, "sendAlertNotification - done");
 	}
 
-	public void setLastrefreshTime(Date dateTime) {
+	public void setPrefs(Date dateTime, String key) {
 		String time = null;
 		try {
 			time = apiformat.format(dateTime);
@@ -662,16 +665,26 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 			Log.d(TAG, "-setLastrefreshTime: apiformat fro calkendar onject failed");
 			e.printStackTrace();
 		}
-		final String PREFS_NAME = "MyPrefsFile";
+		
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
-		editor.putString("lastUpdateTime", time);
+		editor.putString(key, time);
+		// Commit the edits!
+		editor.commit();
+	}
+	
+	public void setPrefs(String helpBubbleInvocationsVal,String key) {
+		String time = null;		
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString(key, helpBubbleInvocationsVal);
 		// Commit the edits!
 		editor.commit();
 	}
 
-	public String getLastrefreshTimeString() {
-		final String PREFS_NAME = "MyPrefsFile";
+	public String getPrefsAsString(String key) {
+		
+		String returntime = null;
 		SharedPreferences settings = null;
 		try {
 			settings = getSharedPreferences(PREFS_NAME, 0);
@@ -680,33 +693,14 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 			Log.d(TAG, "-getLastrefreshTimeString: read from prefs failed");
 			e.printStackTrace();
 		}
-		// String returntime =
-		// settings.getString("lastUpdateTime","1970-01-01 00:00:00 PST");
-		String returntime = settings.getString("lastUpdateTime", "a long time ago.");
-
+		if (key.equals("lastUpdateTime")) {
+			returntime = settings.getString(key, "a long time ago.");
+		} else if (key.equals("helpBubbleInvocations")){
+			returntime = settings.getString(key, "false");
+		}
+		
 		return returntime;
 	}
 
-	public Date getLastrefreshTimeCalendar() {
-		final Calendar apiCalendarObject = Calendar.getInstance();
-		final String PREFS_NAME = "MyPrefsFile";
-		SharedPreferences settings = null;
-		try {
-			settings = getSharedPreferences(PREFS_NAME, 0);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			Log.d(TAG, "-getLastrefreshTimeCalendar: read from prefs failed");
-			e1.printStackTrace();
-		}
-		String returntime = settings.getString("lastUpdateTime", "1970-01-01 00:00:00 PST");
-		try {
-			apiCalendarObject.setTime(apiformat.parse(returntime));
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			Log.d(TAG, "-getLastrefreshTimeCalendar: setTime on calendar object failed");
-			e.printStackTrace();
-		}
-		return apiCalendarObject.getTime();
-	}
 
 }

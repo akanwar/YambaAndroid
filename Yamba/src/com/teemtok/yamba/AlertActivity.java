@@ -91,7 +91,21 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		
 		findViewById(R.id.textCriticalCount).post(new Runnable() {
 			public void run() {
-				showPopup(AlertActivity.this);
+				
+				String showHelp = null;
+				try {
+					showHelp = yamba.getPrefsAsString("helpBubbleInvocations");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					Log.d (TAG, "Failed to read prefs");
+					e.printStackTrace();
+				}
+				if (showHelp.equals("false")) {
+					showPopup(AlertActivity.this);
+				} else {
+					Log.d(TAG, "Not showing bubble help for returning user");
+				}
+				yamba.setPrefs("true", "helpBubbleInvocations");
 			}
 		});
 	}
@@ -138,7 +152,7 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 			e.printStackTrace();
 		}
 
-		alertsRefreshRTextView.setText("Alerts updated: ".concat(yamba.getLastrefreshTimeString()));
+		alertsRefreshRTextView.setText("Alerts updated: ".concat(yamba.getPrefsAsString("lastUpdateTime")));
 	}
 
 	private void refreshAlertData(String filterlevel) {
@@ -239,10 +253,7 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 			 
 			   // Displaying the popup at the specified location, + offsets.
 			   popup.showAtLocation(layout, Gravity.TOP, 0,y);
-			   
-			   
-
-			   // Getting a reference to Close button, and close the popup when clicked.
+		   // Getting a reference to Close button, and close the popup when clicked.
 			   Button close = (Button) layout.findViewById(R.id.close);
 			   close.setOnClickListener(new OnClickListener() {
 			 

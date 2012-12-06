@@ -67,13 +67,13 @@ public class ColorLevelAdapter extends SimpleCursorAdapter { //
 		TextView textLevel = (TextView) row.findViewById(R.id.textAlertLevel); //
 		// //
 		if (level.equals("critical")) {
-			textLevel.setTextColor(Color.parseColor("#FF0000"));
+			textLevel.setTextColor(Color.parseColor("#990000"));
 		} else if (level.equals("warn")) {
-			textLevel.setTextColor(Color.parseColor("#FFFF00"));
+			textLevel.setTextColor(Color.parseColor("#FFCF33"));
 		} else if (level.equals("error")) {
-			textLevel.setTextColor(Color.parseColor("#FFA500"));
+			textLevel.setTextColor(Color.parseColor("#FF9933"));
 		} else {
-			textLevel.setTextColor(Color.parseColor("#FFFFFF"));
+			textLevel.setTextColor(Color.parseColor("#000000"));
 		}
 
 		// Set acknowledged icon
@@ -83,7 +83,7 @@ public class ColorLevelAdapter extends SimpleCursorAdapter { //
 		ackimg = (ImageView) row.findViewById(R.id.imageView1);
 
 		if (isAcked == 1) {
-			ackimg.setImageResource(R.drawable.presence_online);
+			ackimg.setImageResource(R.drawable.presence_online_blue);
 
 		} else {
 			ackimg.setImageResource(R.drawable.presence_invisible);
@@ -116,37 +116,7 @@ public class ColorLevelAdapter extends SimpleCursorAdapter { //
         catch(ParseException pe) {
         	Log.d(TAG,"ERROR: Cannot parse \"" + datefromAPI + "\"");
             pe.printStackTrace();
-        }
-
-		
-		/*
-		//yyyy-MM-dd HH:mm:ss z
-		datefromAPI = "2012";
-
-	
-		
-		Date alertdate = null;
-		try {
-			alertdate = sdf.parse(datefromAPI);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			Log.d(TAG,"Parse exception");
-			//e.printStackTrace();
-		} catch (Exception e) {
-			Log.d(TAG,"Some exception");
-		}
-
-		
-		
-		Log.d(TAG, "Date (from API) is :" + datefromAPI );
-		if (alertdate != null) {
-			Log.d(TAG, "Date to string is :" + alertdate.toString());
-			//Log.d(TAG, "Date (parsed) is : " + alertdate.getYear() +"|"+ alertdate.getMonth() +"|"+ alertdate.getDay() +"|"+ alertdate.getHours() +"|"+ alertdate.getMinutes()+"|"+ alertdate.getSeconds() );
-		}
-		
-		*/
-		
-		
+        }		
 
 	}
 }

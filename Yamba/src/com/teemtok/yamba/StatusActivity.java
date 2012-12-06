@@ -72,6 +72,9 @@ public class StatusActivity extends Activity implements OnClickListener { //
 	PopupWindow popupWindow;
 	LayoutInflater layoutInflater;
 	View popupView;
+	TextView tv1;
+	TextView tv2;
+	TextView tv3;
 
 	/** Called when the activity is first created. */
 
@@ -86,9 +89,13 @@ public class StatusActivity extends Activity implements OnClickListener { //
 		updateButton.setOnClickListener(this);
 		alertsRefreshRTextView = (TextView) findViewById(R.id.idlastAlertsRefreshTime);
 		loggedinStatus = (TextView) findViewById(R.id.idLoggedinstatus);
-		hostButton = (Button) findViewById(R.id.idbuttonListHosts);
-		hostButton.setOnClickListener(this);
+		// hostButton = (Button) findViewById(R.id.idbuttonListHosts);
+		// hostButton.setOnClickListener(this);
 		loggedinImg = (ImageView) findViewById(R.id.imageViewIsLoggedIn);
+		
+		tv1 = (TextView) findViewById(R.id.id_status_CriticalCount);
+		tv2 = (TextView) findViewById(R.id.id_status_ErrorCount);
+		tv3 = (TextView) findViewById(R.id.id_status_WarnCount);
 
 		layoutInflater = (LayoutInflater) getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
 		popupView = layoutInflater.inflate(R.layout.login_popup, null);
@@ -112,7 +119,7 @@ public class StatusActivity extends Activity implements OnClickListener { //
 	public void onResume() {
 		super.onResume();
 
-		alertsRefreshRTextView.setText("Last update: ".concat(yamba.getLastrefreshTimeString()));
+		alertsRefreshRTextView.setText("Last update: ".concat(yamba.getPrefsAsString("lastUpdateTime")));
 
 		if (yamba.isloggedIn()) {
 			if (popupWindow.isShowing()) {
@@ -125,6 +132,11 @@ public class StatusActivity extends Activity implements OnClickListener { //
 			loggedinStatus.setText("Not logged in.");
 		}
 		//
+
+
+		tv1.setText(yamba.getLevelCount("critical"));
+		tv2.setText(yamba.getLevelCount("error"));
+		tv3.setText(yamba.getLevelCount("warn"));
 
 		findViewById(R.id.imageViewIsLogo).post(new Runnable() {
 			public void run() {
@@ -142,7 +154,7 @@ public class StatusActivity extends Activity implements OnClickListener { //
 		boolean success = false;
 		try {
 			if (!yamba.isloggedIn()) {
-				popupWindow.showAtLocation(hostButton, 1, 0, 0);
+				popupWindow.showAtLocation(updateButton, 1, 0, 0);
 				Button btnDismiss = (Button) popupView.findViewById(R.id.iddismiss);
 				success = true;
 				btnDismiss.setOnClickListener(new Button.OnClickListener() {
@@ -170,11 +182,13 @@ public class StatusActivity extends Activity implements OnClickListener { //
 		case R.id.buttonUpdate:
 			Log.d(TAG, "onClicked Starting Alerts Activity");
 			startActivity(new Intent(this, AlertActivity.class));
-			break;
+			break;		
+			/*
 		case R.id.idbuttonListHosts:
 			Log.d(TAG, "onClicked Starting Host List Activity");
 			startActivity(new Intent(this, HostListActivity.class));
 			break;
+			*/
 		default:
 			Log.d(TAG, "onClick called with default" + v.getId());
 			break;

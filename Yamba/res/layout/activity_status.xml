@@ -3,6 +3,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="#fffffd"
     android:orientation="vertical" >
 
     <!-- Title TextView -->
@@ -78,22 +79,63 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/status_activity_count_panel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/status_activity_top"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp" >
+
+        <TextView
+            android:id="@+id/id_status_WarnCount"
+            style="@style/TextViewCounters"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/left_warn_count"
+            android:gravity="center"
+            android:text="@string/rowWarnCount" />
+
+        <TextView
+            android:id="@+id/id_status_ErrorCount"
+            style="@style/TextViewCounters"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/mid_error_count"
+            android:gravity="center"
+            android:text="@string/rowErrorCount" />
+
+        <TextView
+            android:id="@+id/id_status_CriticalCount"
+            style="@style/TextViewCounters"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/right_critical_count"
+            android:gravity="center"
+            android:text="@string/rowCriticalCount" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/status_activity_buttons"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/status_activity_footer" >
+        android:layout_below="@+id/status_activity_count_panel" 
+        android:layout_centerVertical="true">
 
         <Button
             android:id="@+id/buttonUpdate"
             style="@style/ButtonText"
             android:layout_width="fill_parent"
-            android:layout_height="150dip"
+            android:layout_height="wrap_content"
+            
             android:layout_weight="1"
             android:background="@drawable/button_green"
             android:text="@string/buttonUpdate"
             android:textSize="20sp" >
         </Button>
-
+        <!--
         <Button
             android:id="@+id/idbuttonListHosts"
             style="@style/ButtonText"
@@ -104,6 +146,7 @@
             android:text="@string/buttonListHosts"
             android:textSize="20sp" >
         </Button>
+        -->
     </LinearLayout>
 
 </RelativeLayout>

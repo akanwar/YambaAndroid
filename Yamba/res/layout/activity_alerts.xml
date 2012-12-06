@@ -16,10 +16,10 @@
             android:id="@+id/idalert_activity_lastAlertsRefreshTime"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/lastAlertsRefreshTime" 
+            android:layout_marginTop="5dp"
             android:background="#eeeeee"
-            android:layout_marginTop="5dp"/>
+            android:gravity="center"
+            android:text="@string/lastAlertsRefreshTime" />
     </LinearLayout>
 
     <LinearLayout
@@ -29,15 +29,15 @@
         android:layout_alignParentTop="true" >
 
         <Button
-            android:id="@+id/textCriticalCount"
+            android:id="@+id/textWarnCount"
             style="@style/ButtonText"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:layout_weight="1"
-            android:background="@drawable/button_red"
+            android:background="@drawable/button_yellow"
             android:gravity="center"
-            android:text="@string/rowCriticalCount" />
+            android:text="@string/rowWarnCount" />
 
         <Button
             android:id="@+id/textErrorCount"
@@ -51,16 +51,15 @@
             android:text="@string/rowErrorCount" />
 
         <Button
-            android:id="@+id/textWarnCount"
+            android:id="@+id/textCriticalCount"
             style="@style/ButtonText"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:layout_weight="1"
-            android:background="@drawable/button_yellow"
+            android:background="@drawable/button_red"
             android:gravity="center"
-            android:shadowColor="@android:color/darker_gray"
-            android:text="@string/rowWarnCount" />
+            android:text="@string/rowCriticalCount" />
     </LinearLayout>
     <!-- android:background="#FFFF00" -->
 
