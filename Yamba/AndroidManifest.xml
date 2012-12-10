@@ -21,6 +21,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="com.teemtok.yamba.NEW_ALERT" />
+            </intent-filter>
         </activity>
 
         <service android:name=".UpdaterService" />

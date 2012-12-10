@@ -24,10 +24,9 @@ public class DbHelper extends SQLiteOpenHelper { //
 	static final String C_ALERTID = "alertid";
 	static final String C_ISACKED = "isAcked";
 	static final String C_ACKCOMMENT = "ackComment";
-	
-	
+	static final String C_ISREAD = "isRead";
+	static final String C_ISCURRENT = "isCurrent";
 
-	
 	Context context;
 
 	// Constructor
@@ -45,8 +44,7 @@ public class DbHelper extends SQLiteOpenHelper { //
 	// Called whenever newVersion != oldVersion
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { //
-	
+
 	}
 
-	
 }

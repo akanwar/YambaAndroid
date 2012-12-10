@@ -1,308 +1,224 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/idalertdetaillayout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" 
-    android:padding="5dp">
-
-    <!--  -->
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <!--  -->
-
-        <TextView
-            android:id="@+id/idAlertDetailTitle"
-            android:layout_width="fill_parent"
-            android:layout_height="50dip"
-            android:layout_weight="1"
-            android:background="#aaaaaa"
-            android:gravity="center"
-            android:text="@string/textAlertDetailTitle"
-            android:textStyle="bold" />
-        <!--  -->
-
-    </LinearLayout>
+    android:background="#fffffd"
+    android:orientation="vertical"
+    android:padding="1dp" >
 
     <LinearLayout
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
+    <TextView
+        android:id="@+id/idAlertDetailTitle"
+        style="@style/AlertDetailTitleText"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="50dip"
+        android:layout_alignParentTop="true"
+        android:background="#eeeeee"
+        android:gravity="center"
+        android:text="@string/textAlertDetailTitle"
+        android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/idalertid"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textalertid" />
-        <!--  -->
+    <ScrollView
+        android:id="@+id/idalertdetailsscrollview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/idalertdetailacklayout"
+        android:layout_below="@+id/idAlertDetailTitle" >
 
-        <TextView
-            android:id="@+id/idvalalertid"
-            android:layout_width="fill_parent"
+        <TableLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textvalalertid" />
-    </LinearLayout>
+            android:padding="2dp" >
+
+            <TableRow style="@style/AlertDetailTableRow" >
+
+                <TextView
+                    android:id="@+id/idalertid"
+                    style="@style/AlertDetailTableTextViewTitleCol"
+                    android:text="@string/textalertid" />
+
+                <TextView
+                    android:id="@+id/idvalalertid"
+                    style="@style/AlertDetailTableTextViewValCol"
+                    android:text="@string/textvalalertid" />
+            </TableRow>
+
+            <TableRow style="@style/AlertDetailTableRow" >
+
+                <TextView
+                    android:id="@+id/idhost"
+                    style="@style/AlertDetailTableTextViewTitleCol"
+                    android:text="@string/texthost" />
+
+                <TextView
+                    android:id="@+id/idvalhost"
+                    style="@style/AlertDetailTableTextViewValCol"
+                    android:text="@string/textvalhost" />
+            </TableRow>
+
+            <TableRow style="@style/AlertDetailTableRow" >
+
+                <TextView
+                    android:id="@+id/idvalue"
+                    style="@style/AlertDetailTableTextViewTitleCol"
+                    android:text="@string/textvalue" />
+
+                <TextView
+                    android:id="@+id/idvalvalue"
+                    style="@style/AlertDetailTableTextViewValCol"
+                    android:text="@string/textvalvalue" />
+            </TableRow>
+
+            <TableRow style="@style/AlertDetailTableRow" >
+
+                <TextView
+                    android:id="@+id/idlevel"
+                    style="@style/AlertDetailTableTextViewTitleCol"
+                    android:text="@string/textlevel" />
+
+                <TextView
+                    android:id="@+id/idvallevel"
+                    style="@style/AlertDetailTableTextViewValCol"
+                    android:text="@string/textvallevel" />
+            </TableRow>
+
+            <TableRow style="@style/AlertDetailTableRow" >
+
+                <TextView
+                    android:id="@+id/iddatapoint"
+                    style="@style/AlertDetailTableTextViewTitleCol"
+                    android:text="@string/textdatapoint" />
+
+                <TextView
+                    android:id="@+id/idvaldatapoint"
+                    style="@style/AlertDetailTableTextViewValCol"
+                    android:text="@string/textvaldatapoint" />
+            </TableRow>
+
+            <TableRow style="@style/AlertDetailTableRow" >
+
+                <TextView
+                    android:id="@+id/iddatasource"
+                    style="@style/AlertDetailTableTextViewTitleCol"
+                    android:text="@string/textdatasource" />
+
+                <TextView
+                    android:id="@+id/idvaldatasource"
+                    style="@style/AlertDetailTableTextViewValCol"
+                    android:text="@string/textvaldatasource" />
+            </TableRow>
+
+            <TableRow style="@style/AlertDetailTableRow" >
+
+                <TextView
+                    android:id="@+id/iddatasourceinstance"
+                    style="@style/AlertDetailTableTextViewTitleCol"
+                    android:text="@string/textdatasourceinstance" />
+
+                <TextView
+                    android:id="@+id/idvaldatasourceinstance"
+                    style="@style/AlertDetailTableTextViewValCol"
+                    android:text="@string/textvaldatasourceinstance" />
+            </TableRow>
+
+            <TableRow style="@style/AlertDetailTableRow" >
+
+                <TextView
+                    android:id="@+id/idthresholds"
+                    style="@style/AlertDetailTableTextViewTitleCol"
+                    android:text="@string/textthresholds" />
+
+                <TextView
+                    android:id="@+id/idvalthresholds"
+                    style="@style/AlertDetailTableTextViewValCol"
+                    android:text="@string/textvalthresholds" />
+            </TableRow>
+
+            <TableRow style="@style/AlertDetailTableRow" >
+
+                <TextView
+                    android:id="@+id/idstartonlocaltime"
+                    style="@style/AlertDetailTableTextViewTitleCol"
+                    android:text="@string/textstartonlocaltime" />
+
+                <TextView
+                    android:id="@+id/idvalstartonlocaltime"
+                    style="@style/AlertDetailTableTextViewValCol"
+                    android:text="@string/textvalstartonlocaltime" />
+            </TableRow>
+
+            <TableRow style="@style/AlertDetailTableRow" >
+
+                <TextView
+                    android:id="@+id/idAckedList"
+                    style="@style/AlertDetailTableTextViewTitleCol"
+                    android:text="@string/textAckedList" />
+
+                <TextView
+                    android:id="@+id/idvalAckedList"
+                    style="@style/AlertDetailTableTextViewValCol"
+                    android:text="@string/textvalAckedList" />
+            </TableRow>
+
+            <TableRow style="@style/AlertDetailTableRow" >
+
+                <TextView
+                    android:id="@+id/idAckCommentList"
+                    style="@style/AlertDetailTableTextViewTitleCol"
+                    android:text="@string/textAckCommentList" />
+
+                <TextView
+                    android:id="@+id/idvalAckCommentList"
+                    style="@style/AlertDetailTableTextViewValCol"
+                    android:text="@string/textvalAckCommentList" />
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
 
     <LinearLayout
+        android:id="@+id/idalertdetailacklayout"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/idhost"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/texthost" />
-        <!--  -->
-
-        <TextView
-            android:id="@+id/idvalhost"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textvalhost" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/idvalue"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textvalue" />
-        <!--  -->
-
-        <TextView
-            android:id="@+id/idvalvalue"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textvalvalue" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/idlevel"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textlevel" />
-        <!--  -->
-
-        <TextView
-            android:id="@+id/idvallevel"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textvallevel" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/iddatapoint"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textdatapoint" />
-        <!--  -->
-
-        <TextView
-            android:id="@+id/idvaldatapoint"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textvaldatapoint" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/iddatasource"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textdatasource" />
-        <!--  -->
-
-        <TextView
-            android:id="@+id/idvaldatasource"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textvaldatasource" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/iddatasourceinstance"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textdatasourceinstance" />
-        <!--  -->
-
-        <TextView
-            android:id="@+id/idvaldatasourceinstance"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textvaldatasourceinstance" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/idthresholds"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textthresholds" />
-        <!--  -->
-
-        <TextView
-            android:id="@+id/idvalthresholds"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textvalthresholds" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/idstartonlocaltime"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textstartonlocaltime" />
-        <!--  -->
-
-        <TextView
-            android:id="@+id/idvalstartonlocaltime"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textvalstartonlocaltime" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/idAckCommentList"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textAckCommentList" />
-        <!--  -->
-
-        <TextView
-            android:id="@+id/idvalAckCommentList"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textvalAckCommentList" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/idAckedList"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textAckedList" />
-        <!--  -->
-
-        <TextView
-            android:id="@+id/idvalAckedList"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/textvalAckedList" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical" >
 
         <!--  -->
 
         <TextView
             android:id="@+id/idAlertAckTitle"
+            style="@style/AlertDetailTitleText"
             android:layout_width="fill_parent"
             android:layout_height="50dip"
             android:layout_weight="1"
-            android:background="#aaaaaa"
+            android:background="#eeeeee"
             android:gravity="center"
             android:text="@string/textAlertAckTitle"
             android:textStyle="bold" />
         <!--  -->
 
+        <EditText
+            android:id="@+id/idAckComment"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="textMultiLine" >
+        </EditText>
+
+        <Button
+            android:id="@+id/idAckButton"
+            style="@style/ButtonText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/button_blue"
+            android:text="@string/textAckButton" >
+        </Button>
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/idAckComment"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:inputType="textMultiLine" >
-    </EditText>
-
-    <Button
-        android:id="@+id/idAckButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/textAckButton" 
-        
-                    style="@style/ButtonText"
-            android:background="@drawable/button_blue"/>
-
-</LinearLayout>
+</RelativeLayout>

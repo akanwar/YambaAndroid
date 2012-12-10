@@ -5,8 +5,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.AsyncTask;
@@ -59,6 +61,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.teemtok.yamba.AlertActivity.AlertReceiver;
+
 public class StatusActivity extends Activity implements OnClickListener { //
 
 	private static final String TAG = "StatusActivity";
@@ -75,6 +79,12 @@ public class StatusActivity extends Activity implements OnClickListener { //
 	TextView tv1;
 	TextView tv2;
 	TextView tv3;
+	AlertReceiver receiver;
+
+	
+	
+	private IntentFilter alertAutoRefreshFilter;
+	static final String SEND_ALERT_NOTIFICATIONS = "com.teemtok.yamba.SEND_ALERT_NOTIFICATIONS";
 
 	/** Called when the activity is first created. */
 
@@ -93,6 +103,10 @@ public class StatusActivity extends Activity implements OnClickListener { //
 		// hostButton.setOnClickListener(this);
 		loggedinImg = (ImageView) findViewById(R.id.imageViewIsLoggedIn);
 		
+		receiver = new AlertReceiver();
+		alertAutoRefreshFilter = new IntentFilter("com.teemtok.yamba.NEW_ALERT");
+
+
 		tv1 = (TextView) findViewById(R.id.id_status_CriticalCount);
 		tv2 = (TextView) findViewById(R.id.id_status_ErrorCount);
 		tv3 = (TextView) findViewById(R.id.id_status_WarnCount);
@@ -118,6 +132,22 @@ public class StatusActivity extends Activity implements OnClickListener { //
 	@Override
 	public void onResume() {
 		super.onResume();
+		Log.d(TAG, "-onResume");
+
+		
+		try {
+			refreshAlertCounters();
+			super.registerReceiver(receiver, alertAutoRefreshFilter, SEND_ALERT_NOTIFICATIONS, null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+	}
+
+	public void refreshAlertCounters() {
 
 		alertsRefreshRTextView.setText("Last update: ".concat(yamba.getPrefsAsString("lastUpdateTime")));
 
@@ -132,7 +162,6 @@ public class StatusActivity extends Activity implements OnClickListener { //
 			loggedinStatus.setText("Not logged in.");
 		}
 		//
-
 
 		tv1.setText(yamba.getLevelCount("critical"));
 		tv2.setText(yamba.getLevelCount("error"));
@@ -149,7 +178,7 @@ public class StatusActivity extends Activity implements OnClickListener { //
 		});
 
 	}
-
+	
 	boolean popWindowPaint() {
 		boolean success = false;
 		try {
@@ -182,13 +211,12 @@ public class StatusActivity extends Activity implements OnClickListener { //
 		case R.id.buttonUpdate:
 			Log.d(TAG, "onClicked Starting Alerts Activity");
 			startActivity(new Intent(this, AlertActivity.class));
-			break;		
-			/*
-		case R.id.idbuttonListHosts:
-			Log.d(TAG, "onClicked Starting Host List Activity");
-			startActivity(new Intent(this, HostListActivity.class));
 			break;
-			*/
+		/*
+		 * case R.id.idbuttonListHosts: Log.d(TAG,
+		 * "onClicked Starting Host List Activity"); startActivity(new
+		 * Intent(this, HostListActivity.class)); break;
+		 */
 		default:
 			Log.d(TAG, "onClick called with default" + v.getId());
 			break;
@@ -232,4 +260,16 @@ public class StatusActivity extends Activity implements OnClickListener { //
 		Log.d(TAG, "httpclient destroyed");
 	}
 
+
+	class AlertReceiver extends BroadcastReceiver { //
+		@Override
+		public void onReceive(Context context, Intent intent) { //
+			// cursor.requery(); //
+			//refreshAlertData("any");
+			//colorAdapter.notifyDataSetChanged(); //
+			refreshAlertCounters();
+			Log.d(TAG, "onReceived New Alerts from updaterservice2, doing self refresh");
+		}
+	}
+	
 }

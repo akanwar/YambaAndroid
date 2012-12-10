@@ -24,8 +24,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -97,6 +100,29 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 		this.yamba = (YambaApplication) getApplication();
 		getAlertDetailbyID(firstKeyName);
 
+		//LinearLayout fullwindow = (LinearLayout) findViewById(R.id.idalertdetaillayout);
+		RelativeLayout fullwindow = (RelativeLayout) findViewById(R.id.idalertdetaillayout);
+
+		fullwindow.setOnTouchListener(new OnSwipeTouchListener() {
+			public void onSwipeTop() {
+				//Toast.makeText(AlertDetailActivity.this, "top", Toast.LENGTH_SHORT).show();
+			}
+
+			public void onSwipeRight() {
+				Toast.makeText(AlertDetailActivity.this, "right", Toast.LENGTH_SHORT).show();
+				finish();
+			}
+
+			public void onSwipeLeft() {
+				//Toast.makeText(AlertDetailActivity.this, "left", Toast.LENGTH_SHORT).show();
+			}
+
+			public void onSwipeBottom() {
+				//Toast.makeText(AlertDetailActivity.this, "bottom", Toast.LENGTH_SHORT).show();
+			}
+
+		});
+
 	}
 
 	@SuppressWarnings("deprecation")
@@ -104,8 +130,7 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 
 		// Get the data from the database
 		try {
-			cursor = db.query(DbHelper.TABLE, null, DbHelper.C_ID + "=" + key,
-					null, null, null, null);
+			cursor = db.query(DbHelper.TABLE, null, DbHelper.C_ID + "=" + key, null, null, null, null);
 			// cursor = db.rawQuery("select * from lomoalerts", null);
 			// cursor = db.query(DbHelper.TABLE, null, null, null, null, null,
 			// DbHelper.C_STARTONUNIXTIME + " DESC");
@@ -122,34 +147,22 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 		if (cursor != null) {
 
 			// startManagingCursor(cursor);
-			Log.d(TAG,
-					"cursor was NOT NULL and has X rows : " + cursor.getCount());
+			Log.d(TAG, "cursor was NOT NULL and has X rows : " + cursor.getCount());
 
 			cursor.moveToFirst();
 
 			int id = cursor.getInt(cursor.getColumnIndex(DbHelper.C_ID));
-			String host = cursor.getString(cursor
-					.getColumnIndex(DbHelper.C_HOST));
-			String alertid = cursor.getString(cursor
-					.getColumnIndex(DbHelper.C_ALERTID));
-			String value = cursor.getString(cursor
-					.getColumnIndex(DbHelper.C_VALUE));
-			String level = cursor.getString(cursor
-					.getColumnIndex(DbHelper.C_LEVEL));
-			String datapoint = cursor.getString(cursor
-					.getColumnIndex(DbHelper.C_DATAPOINT));
-			String datasource = cursor.getString(cursor
-					.getColumnIndex(DbHelper.C_DATASOURCE));
-			String datasourceinstance = cursor.getString(cursor
-					.getColumnIndex(DbHelper.C_DATASOURCEINSTANCE));
-			String thresholds = cursor.getString(cursor
-					.getColumnIndex(DbHelper.C_THRESHOLDS));
-			String startonlocaltime = cursor.getString(cursor
-					.getColumnIndex(DbHelper.C_STARTONLOCALTIME));
-			String ackComment = cursor.getString(cursor
-					.getColumnIndex(DbHelper.C_ACKCOMMENT));
-			int isAcked = cursor.getInt(cursor
-					.getColumnIndex(DbHelper.C_ISACKED));
+			String host = cursor.getString(cursor.getColumnIndex(DbHelper.C_HOST));
+			String alertid = cursor.getString(cursor.getColumnIndex(DbHelper.C_ALERTID));
+			String value = cursor.getString(cursor.getColumnIndex(DbHelper.C_VALUE));
+			String level = cursor.getString(cursor.getColumnIndex(DbHelper.C_LEVEL));
+			String datapoint = cursor.getString(cursor.getColumnIndex(DbHelper.C_DATAPOINT));
+			String datasource = cursor.getString(cursor.getColumnIndex(DbHelper.C_DATASOURCE));
+			String datasourceinstance = cursor.getString(cursor.getColumnIndex(DbHelper.C_DATASOURCEINSTANCE));
+			String thresholds = cursor.getString(cursor.getColumnIndex(DbHelper.C_THRESHOLDS));
+			String startonlocaltime = cursor.getString(cursor.getColumnIndex(DbHelper.C_STARTONLOCALTIME));
+			String ackComment = cursor.getString(cursor.getColumnIndex(DbHelper.C_ACKCOMMENT));
+			int isAcked = cursor.getInt(cursor.getColumnIndex(DbHelper.C_ISACKED));
 
 			idvalalertid.setText(alertid);
 			idvalhost.setText(host);
@@ -173,8 +186,7 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 				ackButton.setVisibility(View.INVISIBLE);
 			}
 
-			Log.d(TAG, " Got id|host|alertid|value|level: " + id + "|" + host
-					+ "|" + alertid + "|" + value + "|" + level);
+			Log.d(TAG, " Got id|host|alertid|value|level: " + id + "|" + host + "|" + alertid + "|" + value + "|" + level);
 			// Log.d(TAG,
 			// " Got datapoint|datasource|datasourceinstance|threshold|startonlocaltime|ackComment|ACKED??: "
 			// + datapoint +"|"+ datasource +"|"+ datasourceinstance +"|"+
@@ -230,32 +242,26 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 
 		// String ackComment = editAckText.getText().toString().replaceAll(" ",
 		// "+");
-		String LOMO_ACK_STRING = "https://".concat(yamba.getLomoCredentials().getCompany()).concat(".logicmonitor.com/santaba/rpc/confirmAlerts?ids=")
-				.concat(idvalalertid
-						.getText()
-						.toString()
-						.concat("&comment=")
-						.concat(editAckText.getText().toString()
-								.replaceAll(" ", "+")));
+		String LOMO_ACK_STRING = "https://".concat(yamba.getLomoCredentials().getCompany())
+				.concat(".logicmonitor.com/santaba/rpc/confirmAlerts?ids=")
+				.concat(idvalalertid.getText().toString().concat("&comment=").concat(editAckText.getText().toString().replaceAll(" ", "+")));
 		Log.d(TAG1, "This is ACK URL: " + LOMO_ACK_STRING);
 		boolean ackworked = yamba.pushAckandAckComment(LOMO_ACK_STRING);
 		Log.d(TAG1, "done calling yamb push ack. success : " + ackworked);
-		
+
 		editAckText.setVisibility(View.INVISIBLE);
 		ackButton.setVisibility(View.INVISIBLE);
 
 		if (ackworked) {
-			text = "Alert id: ".concat(idvalalertid.getText().toString())
-					.concat(" is acked.");
+			text = "Alert id: ".concat(idvalalertid.getText().toString()).concat(" is acked.");
 			if (yamba.getLomoAlerts()) {
-				Log.d (TAG1,"Yamba Alerts call successfull");
+				Log.d(TAG1, "Yamba Alerts call successfull");
 			} else {
-				Log.d (TAG1,"Yamba Alerts call unsuccessfull");
+				Log.d(TAG1, "Yamba Alerts call unsuccessfull");
 			}
-				
+
 		} else {
-			text = "Alert id: ".concat(idvalalertid.getText().toString())
-					.concat(" could not be acked.");
+			text = "Alert id: ".concat(idvalalertid.getText().toString()).concat(" could not be acked.");
 		}
 
 		Toast toast = Toast.makeText(context, text, duration);

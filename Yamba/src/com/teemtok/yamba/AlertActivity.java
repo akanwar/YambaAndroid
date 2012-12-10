@@ -5,6 +5,7 @@ import com.teemtok.yamba.PullToRefreshListView.OnRefreshListener;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -80,24 +81,21 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		});
 
 		listView.setOnItemClickListener(this);
-		
 
 		// Connect to database
 
 		dbHelper = new DbHelper(this);
 		db = dbHelper.getReadableDatabase();
 		this.yamba = (YambaApplication) getApplication();
-		
-		
 		findViewById(R.id.textCriticalCount).post(new Runnable() {
 			public void run() {
-				
+
 				String showHelp = null;
 				try {
 					showHelp = yamba.getPrefsAsString("helpBubbleInvocations");
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
-					Log.d (TAG, "Failed to read prefs");
+					Log.d(TAG, "Failed to read prefs");
 					e.printStackTrace();
 				}
 				if (showHelp.equals("false")) {
@@ -114,6 +112,7 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		// TODO Auto-generated method stub
 		Log.d(TAG, "You clicked on view : " + arg1.getId() + " position : " + arg2 + " and id : " + arg3);
+		yamba.insertisReadinfo(arg3);
 		Intent myIntent = new Intent(this, AlertDetailActivity.class);
 		myIntent.putExtra("primarykey", arg3);
 		startActivity(myIntent);
@@ -216,54 +215,58 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 		}
 
 	}
-	
-	
-	
-	
-	private void showPopup(final Activity context) {
-			   int popupWidth = 400;
-			   int popupHeight = 280;
-			   //int y = (textcriticalCount.getLeft()+ textcriticalCount.getRight())/2;
-			   
-			   LinearLayout l = (LinearLayout) context.findViewById(R.id.alert_activity_middle);
-			   int x = l.getLeft();
-			   int y = l.getTop()+75;
-			   
-			   Log.d(TAG, " alert_activity_middle coordinates" + x + " " + y);
-			   
-			   // Inflate the popup_layout.xml
-			   LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.idHelpPopup);
-			   LayoutInflater layoutInflater = (LayoutInflater) context
-			     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			   View layout = layoutInflater.inflate(R.layout.bubble_layout, viewGroup);
-			 
-			   // Creating the PopupWindow
-			   final PopupWindow popup = new PopupWindow(context);
-			   popup.setContentView(layout);
-			   popup.setWidth(popupWidth);
-			   popup.setHeight(popupHeight);
-			   popup.setFocusable(true);
-			 
-			   // Some offset to align the popup a bit to the right, and a bit down, relative to button's position.
-			   int OFFSET_X = 30;
-			   int OFFSET_Y = 30;
-			 
-			   // Clear the default translucent background
-			   popup.setBackgroundDrawable(new BitmapDrawable());
-			 
-			   // Displaying the popup at the specified location, + offsets.
-			   popup.showAtLocation(layout, Gravity.TOP, 0,y);
-		   // Getting a reference to Close button, and close the popup when clicked.
-			   Button close = (Button) layout.findViewById(R.id.close);
-			   close.setOnClickListener(new OnClickListener() {
-			 
-			     @Override
-			     public void onClick(View v) {
-			       popup.dismiss();
-			     }
-			   });
 
+	private void showPopup(final Activity context) {
+		int popupWidth = 400;
+		int popupHeight = 380;
+		// int y = (textcriticalCount.getLeft()+
+		// textcriticalCount.getRight())/2;
+
+		LinearLayout l = (LinearLayout) context.findViewById(R.id.alert_activity_middle);
+		int x = l.getLeft();
+		int y = l.getTop() + 75;
+
+		Log.d(TAG, " alert_activity_middle coordinates" + x + " " + y);
+
+		// Inflate the popup_layout.xml
+		LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.idHelpPopup);
+		LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View layout = layoutInflater.inflate(R.layout.bubble_layout, viewGroup);
+
+		// Creating the PopupWindow
+		final PopupWindow popup = new PopupWindow(context);
+		popup.setContentView(layout);
+		popup.setWidth(popupWidth);
+		popup.setHeight(popupHeight);
+		popup.setFocusable(true);
+
+		// Some offset to align the popup a bit to the right, and a bit down,
+		// relative to button's position.
+		int OFFSET_X = 30;
+		int OFFSET_Y = 30;
+
+		// Clear the default translucent background
+		popup.setBackgroundDrawable(new BitmapDrawable());
+
+		// Displaying the popup at the specified location, + offsets.
+		popup.showAtLocation(layout, Gravity.TOP, 0, y);
+		// Getting a reference to Close button, and close the popup when
+		// clicked.
+		Button close = (Button) layout.findViewById(R.id.close);
+		close.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				popup.dismiss();
 			}
+		});
+
+	}
+	
+
+	
+	
+	
 
 	class AlertReceiver extends BroadcastReceiver { //
 		@Override

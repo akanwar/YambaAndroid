@@ -23,6 +23,5 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class HostListActivity extends Activity {
-	
-	
+
 }

@@ -15,7 +15,6 @@ public class UpdaterService2 extends IntentService {
 
 	YambaApplication yamba;
 
-
 	public static final String NEW_ALERT_INTENT = "com.teemtok.yamba.NEW_ALERT";
 	public static final String NEW_ALERT_EXTRA_COUNT = "NEW_ALERT_EXTRA_COUNT";
 	public static final String RECEIVE_ALERT_NOTIFICATIONS = "com.teemtok.yamba.RECEIVE_ALERT_NOTIFICATIONS";
@@ -29,6 +28,7 @@ public class UpdaterService2 extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent inIntent) {
 		Intent intent;
+		int numNewAlerts;
 		Log.d(TAG, "onHandleIntent'ing");
 
 		try {
@@ -47,29 +47,33 @@ public class UpdaterService2 extends IntentService {
 				Log.d(TAG, "Already logged in - calling getLomoAlerts");
 				if (yamba.getLomoAlerts()) {
 					Log.d(TAG, "Yamba Alerts call successfull");
-					int numNewAlerts = yamba.anynewalerts();
+					numNewAlerts = yamba.anynewalerts();
+					Log.d(TAG, "NumAlerts after yamba count is:  " + numNewAlerts);
+					intent = new Intent(NEW_ALERT_INTENT);
 					if (numNewAlerts > 0) {
-						Log.d(TAG, "We have a new alerts ! numalerts is " + numNewAlerts);
-						intent = new Intent(NEW_ALERT_INTENT);
+						Log.d(TAG, "We have a new alerts! numalerts is " + numNewAlerts);						
 						intent.putExtra(NEW_ALERT_EXTRA_COUNT, numNewAlerts);
 						sendBroadcast(intent, RECEIVE_ALERT_NOTIFICATIONS);
 						yamba.sendAlertNotification(numNewAlerts);
+					} else if (numNewAlerts < 0) {
+						Log.d(TAG, "Some alerts disappeared! numalerts is " + numNewAlerts);
+						Log.d(TAG, "clearing nofication bar");
+						sendBroadcast(intent, RECEIVE_ALERT_NOTIFICATIONS);
+						yamba.cancelAlertNotification(numNewAlerts);
 					}
 				} else {
 					yamba.setloggedIn(false);
-					Log.d(TAG, "Yamba Alerts call unsuccessfull");				
+					Log.d(TAG, "Yamba Alerts call unsuccessfull");
 				}
 
 			} else {
-				Log.d(TAG,
-						"Need to log in  - NOT calling getLomoAlerts, but logging in for next iteration");
+				Log.d(TAG, "Need to log in  - NOT calling getLomoAlerts, but logging in for next iteration");
 				LomoCredentials lomo1 = yamba.getLomoCredentials();
 				String ystatus = null;
 				if (lomo1 != null) {
 					ystatus = yamba.lomoLogin(lomo1);
 				} else {
-					Log.d(TAG,
-							"lomo credemtials are null please enter username pwd or company");
+					Log.d(TAG, "lomo credemtials are null please enter username pwd or company");
 				}
 
 				if (!yamba.isloggedIn()) {
@@ -91,6 +95,4 @@ public class UpdaterService2 extends IntentService {
 
 	}
 
-
 }
-

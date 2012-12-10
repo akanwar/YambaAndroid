@@ -3,6 +3,8 @@ package com.teemtok.yamba;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -67,14 +69,16 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 	private int totalalertcount_new = 0;
 	private int totalalertcount_prev = 0;
 
+	private String alertStringCksum_new = null;
+	private String alertStringCksum_prev = null;
+
 	private NotificationManager notificationManager; //
 	private Notification notification;
 
 	private StringBuilder sb = null;
 	SimpleDateFormat apiformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-	
+
 	final String PREFS_NAME = "MyPrefsFile";
-	
 
 	// private JSONObject jsonLomoAlertsOuterObject;
 
@@ -116,7 +120,7 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 
 			if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password) && !TextUtils.isEmpty(company)) {
 				this.lomo = new LomoCredentials(username, password, company);
-			} 
+			}
 		}
 		return this.lomo;
 	}
@@ -153,15 +157,15 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 				String ystatus = null;
 				if (lomo1 != null) {
 					ystatus = lomoLogin(lomo1);
-					if(isloggedIn()) {
-						Log.d(TAG,"-onSharedPreferenceChanged Staring Service!");
+					if (isloggedIn()) {
+						Log.d(TAG, "-onSharedPreferenceChanged Staring Service!");
 						setAlarms(getApplicationContext());
 						toast = Toast.makeText(getApplicationContext(), testSuccessLogin, duration);
 						toast.show();
 					} else {
 						toast = Toast.makeText(getApplicationContext(), textFailedLogin, duration);
 						toast.show();
-					} 					
+					}
 				}
 				Log.d(TAG, "End of preference change : " + ystatus);
 
@@ -211,15 +215,11 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 			Log.d(TAG, "returned strange HTTP(in body): code|errmsg" + code + "|" + httpresp[2]);
 			loggedIn = false;
 		}
-/*
-		if (loggedIn) {
-			// Send a intent to the service to start
-			setAlarms(getApplicationContext());
-		} else {
-			// no need to run the service
-			stopAlarms(getApplicationContext());
-		}
-*/
+		/*
+		 * if (loggedIn) { // Send a intent to the service to start
+		 * setAlarms(getApplicationContext()); } else { // no need to run the
+		 * service stopAlarms(getApplicationContext()); }
+		 */
 		Log.d(TAG, "end of lomoLogin");
 		// TBD modify to return different codes for successful and failed logins
 		return httpresp[3];
@@ -369,11 +369,31 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 
 		// TBD format response into a list generic of some sort
 		alertString = httpresp[1];
+		alertStringCksum_prev = alertStringCksum_new;
+		alertStringCksum_new = md5(alertString);
+		Log.d(TAG1, "Checksums are OLD|NEW :" + alertStringCksum_prev + "|" + alertStringCksum_new);
+
 		if (success) {
-			lomodata.purgeDataBeforeInsert();
+
+			// lomodata.purgeDataBeforeInsert();
 			try {
 				totalalertcount_prev = totalalertcount_new;
-				parseJSONandUpdateDB();
+				if (!(alertStringCksum_new.equals(alertStringCksum_prev))) {
+					Log.d(TAG1, "Start DB updates as checksums were different ...");
+					if (lomodata.zeroCurrentAlerts()) {
+						Log.d(TAG1, "isCurrent successfully set to 0 for old alerts");
+					} else {
+						Log.d(TAG1, "isCurrent set to 0 failed");
+					}
+					parseJSONandUpdateDB();
+					if (lomodata.deleteStaleAlerts()) {
+						Log.d(TAG1, "Rows with isCurrent = 0 deleted successfully");
+					} else {
+						Log.d(TAG1, "Delete on iscurrent = 0 failed..");
+					}
+				} else {
+					Log.d(TAG1, "Optimizing: Skipping DB updates as checksums were same");
+				}
 				totalalertcount_new = lomodata.getAlertCount("any");
 				Log.d(TAG1, "prev alerts | new alerts" + totalalertcount_prev + "|" + totalalertcount_new);
 				final Calendar apiCalendarObjectGetAlerts = Calendar.getInstance();
@@ -440,6 +460,7 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 			values.put(LomoData.C_STARTONLOCALTIME, alertsobject.getJSONObject(i).getString("startOnLocal"));
 			values.put(LomoData.C_STARTONUNIXTIME, alertsobject.getJSONObject(i).getString("startOn"));
 			values.put(LomoData.C_ALERTID, alertsobject.getJSONObject(i).getInt("id"));
+			values.put(LomoData.C_ID, alertsobject.getJSONObject(i).getInt("id"));
 			boolean isackedFlag = alertsobject.getJSONObject(i).getBoolean("acked");
 			if (isackedFlag) {
 				values.put(LomoData.C_ISACKED, 1);
@@ -447,6 +468,7 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 				values.put(LomoData.C_ISACKED, 0);
 			}
 			values.put(LomoData.C_ACKCOMMENT, alertsobject.getJSONObject(i).getString("ackComment").replaceAll("\n", ""));
+			values.put(LomoData.C_ISCURRENT, 1);
 			lomodata.insertOrIgnore(values);
 
 		}
@@ -555,12 +577,8 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 
 	}
 
-	int anynewalerts() {
-		if (totalalertcount_new > totalalertcount_prev) {
-			return totalalertcount_new - totalalertcount_prev;
-		} else {
-			return 0;
-		}
+	public int anynewalerts() {
+		return totalalertcount_new - totalalertcount_prev;
 	}
 
 	public boolean setAlarms(Context context) {
@@ -593,7 +611,7 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 		try {
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE); //
 			alarmManager.cancel(pendingIntent);
-			alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent); //
+			alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 2000, interval, pendingIntent); //
 			Log.d(TAG1, "Setting alarm succeeded");
 			// alarmManager.get
 			isAlarmFiring = true;
@@ -642,18 +660,27 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 		Context c = getApplicationContext();
 		this.notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE); //
 		long now = System.currentTimeMillis();
-		//Date myDate = new Date();
-		this.notification = new Notification(R.drawable.lomoalertsicon, "You have ".concat(Integer.toString(numNewAlerts)).concat(" new alerts!"), now);
+		// Date myDate = new Date();
+		this.notification = new Notification(R.drawable.lomoalertsicon, "You have ".concat(Integer.toString(numNewAlerts)).concat(" new alerts!"),
+				now);
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(c, -1, new Intent(c, AlertActivity.class), PendingIntent.FLAG_UPDATE_CURRENT); //
 
-		//this.notification.when = SystemClock.elapsedRealtime(); //
+		// this.notification.when = SystemClock.elapsedRealtime(); //
 		this.notification.flags |= Notification.FLAG_AUTO_CANCEL; //
 		CharSequence notificationTitle = this.getText(R.string.msgNotificationTitle); //
 		CharSequence notificationSummary = this.getString(R.string.msgNotificationMessage, numNewAlerts);
 		this.notification.setLatestEventInfo(this, notificationTitle, notificationSummary, pendingIntent); //
 		this.notificationManager.notify(0, this.notification);
 		Log.d(TAG, "sendAlertNotification - done");
+	}
+
+	public void cancelAlertNotification(int numNewAlerts) {
+
+		Log.d(TAG, "cencelAlertNotification begin ");
+		this.notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE); //
+		this.notificationManager.cancelAll();
+		Log.d(TAG, "cancelAlertNotification - done");
 	}
 
 	public void setPrefs(Date dateTime, String key) {
@@ -665,16 +692,16 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 			Log.d(TAG, "-setLastrefreshTime: apiformat fro calkendar onject failed");
 			e.printStackTrace();
 		}
-		
+
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString(key, time);
 		// Commit the edits!
 		editor.commit();
 	}
-	
-	public void setPrefs(String helpBubbleInvocationsVal,String key) {
-		String time = null;		
+
+	public void setPrefs(String helpBubbleInvocationsVal, String key) {
+		String time = null;
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString(key, helpBubbleInvocationsVal);
@@ -683,7 +710,7 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 	}
 
 	public String getPrefsAsString(String key) {
-		
+
 		String returntime = null;
 		SharedPreferences settings = null;
 		try {
@@ -695,12 +722,46 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 		}
 		if (key.equals("lastUpdateTime")) {
 			returntime = settings.getString(key, "a long time ago.");
-		} else if (key.equals("helpBubbleInvocations")){
+		} else if (key.equals("helpBubbleInvocations")) {
 			returntime = settings.getString(key, "false");
 		}
-		
+
 		return returntime;
 	}
 
+	private String md5(String in) {
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+			digest.reset();
+			digest.update(in.getBytes());
+			byte[] a = digest.digest();
+			int len = a.length;
+			StringBuilder sb = new StringBuilder(len << 1);
+			for (int i = 0; i < len; i++) {
+				sb.append(Character.forDigit((a[i] & 0xf0) >> 4, 16));
+				sb.append(Character.forDigit(a[i] & 0x0f, 16));
+			}
+			return sb.toString();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	void insertisReadinfo(long arg3) {
+		ContentValues values = new ContentValues();
+
+		values.clear();
+		values.put(LomoData.C_ALERTID, arg3);
+		values.put(LomoData.C_ISREAD, 1);
+		lomodata.insertOrIgnoreisReadInfo(values);
+
+	}
+
+	boolean getisReadinfo(long arg3) {
+		return lomodata.getisReadInfofromDb(arg3);
+
+	}
 
 }

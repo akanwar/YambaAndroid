@@ -1,48 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/idHelpPopup"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content" 
-            android:orientation="vertical">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/help_popup"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="15dp" >
 
-    <RelativeLayout
-        android:id="@+id/popup"
+    <TextView
+        android:id="@+id/help_textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@drawable/helpbubble3"
- >
+        android:gravity="center"
+        android:text="@+string/textBubble1"
+        android:textColor="#ffffff" />
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:text="@+string/textBubble"
-            android:textColor="#ffffff" />
+    <Button
+        android:id="@+id/close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
+        android:background="@drawable/button_black"
+        android:gravity="center"
+        android:text="@+string/textBubblebutton"
+        android:textColor="#ffffff" />
 
-        <Button
-            android:id="@+id/close"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-                        android:layout_alignParentRight="true"
-            android:background="@drawable/button_black"
-            android:text="@+string/textBubblebutton"
-            android:textColor="#ffffff" />
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/help_textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@+string/textBubble2"
+        android:textColor="#ffffff" />
 
     <ImageView
         android:id="@+id/idDownArrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dip"
-        android:layout_marginRight="15dip"
-        android:src="@drawable/ptr_pulltorefresh_arrow"
-         android:layout_alignParentBottom="true"
-         android:layout_centerInParent="true"/>
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:src="@drawable/ptr_pulltorefresh_arrow" />
 
-</RelativeLayout>
+</LinearLayout>

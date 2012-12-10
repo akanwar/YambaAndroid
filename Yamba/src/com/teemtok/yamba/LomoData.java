@@ -14,6 +14,7 @@ public class LomoData { //
 	static final String DB_NAME = "lomoalerts.db"; //
 	static final int DB_VERSION = 1; //
 	static final String TABLE = "lomoalerts"; //
+	static final String TABLE_ISREAD = "isReadInfo";
 	static final String C_ID = BaseColumns._ID;
 	static final String C_DATAPOINT = "dataPoint";
 	static final String C_DATASOURCE = "dataSource";
@@ -27,9 +28,10 @@ public class LomoData { //
 	static final String C_ALERTID = "alertid";
 	static final String C_ISACKED = "isAcked";
 	static final String C_ACKCOMMENT = "ackComment";
+	static final String C_ISREAD = "isRead";
+	static final String C_ISCURRENT = "isCurrent";
 	private static final String GET_ALL_ORDER_BY = C_STARTONUNIXTIME + " DESC";
-	private static final String[] MAX_CREATED_AT_COLUMNS = { "max("
-			+ LomoData.C_STARTONUNIXTIME + ")" };
+	private static final String[] MAX_CREATED_AT_COLUMNS = { "max(" + LomoData.C_STARTONUNIXTIME + ")" };
 	long tableexists;
 
 	// DbHelper implementations
@@ -40,8 +42,7 @@ public class LomoData { //
 
 		boolean doesTableExist(SQLiteDatabase db) {
 
-			String doesTableExistSQL = "SELECT count(name) as count FROM sqlite_master where name = '"
-					+ TABLE + "'";
+			String doesTableExistSQL = "SELECT count(name) as count FROM sqlite_master where name = '" + TABLE + "'";
 			Cursor c = db.rawQuery(doesTableExistSQL, null);
 			c.moveToFirst();
 			tableexists = c.getLong(c.getColumnIndex("count"));
@@ -63,24 +64,31 @@ public class LomoData { //
 
 			if (!doesTableExist(db)) {
 				Log.d(TAG, "Creating database: " + DB_NAME);
-				String sql = "create table " + TABLE + " (" + C_ID
-						+ " integer primary key, " + C_DATAPOINT + " text, "
-						+ C_DATASOURCE + " text, " + C_DATASOURCEINSTANCE
-						+ " text, " + C_HOST + " text, " + C_LEVEL + " text, "
-						+ C_VALUE + " text, " + C_THRESHOLDS + " text, "
-						+ C_STARTONLOCALTIME + " text, " + C_STARTONUNIXTIME
-						+ " integer, " + C_ALERTID + " integer, " + C_ISACKED
-						+ " integer, " + C_ACKCOMMENT + " text) ";
+				String sql = "create table " + TABLE + " (" + C_ID + " integer primary key , " + C_DATAPOINT + " text, " + C_DATASOURCE + " text, "
+						+ C_DATASOURCEINSTANCE + " text, " + C_HOST + " text, " + C_LEVEL + " text, " + C_VALUE + " text, " + C_THRESHOLDS
+						+ " text, " + C_STARTONLOCALTIME + " text, " + C_STARTONUNIXTIME + " integer, " + C_ALERTID + " integer , " + C_ISACKED
+						+ " integer, " + C_ACKCOMMENT + " text, " + C_ISCURRENT + " integer )";
+				String isReadsql = "create table " + TABLE_ISREAD + " (" + C_ALERTID + " integer primary key , " + C_ISREAD + " integer )";
 
 				try {
 					db.execSQL(sql); //
+
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
-					Log.d(TAG,
-							"Table creation failed due to error in create table query!!");
+					Log.d(TAG, "Table creation lomoalerts failed due to error in create table query!!");
 					// e.printStackTrace();
 				}
 				Log.d(TAG, "onCreated sql: " + sql);
+				try {
+					db.execSQL(isReadsql); //
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					Log.d(TAG, "Table creation for isReadInfo failed due to error in create table query!!");
+					// e.printStackTrace();
+				}
+				Log.d(TAG, "onCreated isRead sql: " + isReadsql);
+
 			} else {
 				Log.d(TAG, "Table exists so skipping Create ");
 			}
@@ -125,15 +133,83 @@ public class LomoData { //
 
 	public void insertOrIgnore(ContentValues values) { //
 		// Log.d(TAG, "insertOrIgnore");
+		long rowid = -1;
 		SQLiteDatabase db = this.dbHelper.getWritableDatabase(); //
-			try {
-				db.insertWithOnConflict(TABLE, null, values,
-						SQLiteDatabase.CONFLICT_IGNORE);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				Log.d(TAG, "-insertOrIgnore: Database insert failed");
-				e.printStackTrace();
-			} //
+		try {
+			rowid = db.insertWithOnConflict(TABLE, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+			Log.d(TAG, "-insertOrIgnore: Insert happened and returned rowid = " + rowid);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Log.d(TAG, "-insertOrIgnore: Database insert failed. rowid = " + rowid);
+			e.printStackTrace();
+		} //
+
+	}
+
+	public void insertOrIgnoreisReadInfo(ContentValues values) { //
+		// Log.d(TAG, "insertOrIgnore");
+		long rowid = -1;
+		SQLiteDatabase db = this.dbHelper.getWritableDatabase(); //
+		try {
+			rowid = db.insertWithOnConflict(TABLE_ISREAD, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Log.d(TAG, "-insertOrIgnoreisReadInfo: Database insert failed. rowid = " + rowid);
+			e.printStackTrace();
+		} //
+		//Log.d(TAG, "-insertOrIgnoreisReadInfo: Insert happened and returned rowid = " + rowid);
+
+	}
+
+	public boolean zeroCurrentAlerts() {
+		SQLiteDatabase db = this.dbHelper.getWritableDatabase();
+		boolean ret = false;
+
+		String SQL_STATEMENT = null;
+		String[] qparams = null;
+
+		SQL_STATEMENT = "UPDATE  " + TABLE + "  SET " + C_ISCURRENT + " = 0 WHERE " + C_ISCURRENT + " = " + C_ISCURRENT;
+
+		try {
+			db.execSQL(SQL_STATEMENT);
+			ret = true;
+		} catch (Exception e) {
+			// db.close();
+			ret = false;
+			Log.d(TAG, "-zeroCurrentAlerts: Database insert failed on isCurrent for lomoalerts");
+			e.printStackTrace();
+			return ret;
+		}
+
+		Log.d(TAG, "-zeroCurrentAlerts: isCurrent set to 0 for lomoalerts");
+		return ret;
+
+	}
+	
+	
+	public boolean deleteStaleAlerts() {
+		SQLiteDatabase db = this.dbHelper.getWritableDatabase();
+		boolean ret = false;
+
+		String SQL_STATEMENT = null;
+		String[] qparams = null;
+
+		SQL_STATEMENT = "DELETE from " + TABLE + " WHERE " + C_ISCURRENT + " = 0 ";
+
+		try {
+			db.execSQL(SQL_STATEMENT);
+			ret = true;
+		} catch (Exception e) {
+			// db.close();
+			ret = false;
+			Log.d(TAG, "-dropStaleAlerts: Database delete failed on isCurrent = 0 for lomoalerts");
+			e.printStackTrace();
+			return ret;
+		}
+
+		Log.d(TAG, "-dropStaleAlerts: isCurrent = 0 is deleted from lomoalerts");
+		return ret;
 
 	}
 
@@ -147,7 +223,7 @@ public class LomoData { //
 		int ret = 0;
 
 		String SQL_STATEMENT = null;
-		String [] qparams = null;
+		String[] qparams = null;
 
 		if (level.equals("any")) {
 			SQL_STATEMENT = "SELECT COUNT(*) FROM lomoalerts";
@@ -182,5 +258,37 @@ public class LomoData { //
 		} finally {
 			// db.close(); //
 		}
+	}
+
+	public synchronized boolean getisReadInfofromDb(long alertId) { //
+		SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+		int ret = 0;
+
+		String SQL_STATEMENT = null;
+		String[] qparams = null;
+
+		SQL_STATEMENT = "SELECT " + C_ISREAD + " FROM " + TABLE_ISREAD + " where " + C_ALERTID + " = ?";
+		qparams = new String[] { Long.toString(alertId) };
+
+		try {
+			Cursor cursor = db.rawQuery(SQL_STATEMENT, qparams);
+
+			try {
+				ret = cursor.moveToNext() ? cursor.getInt(0) : 0;
+			} finally {
+				cursor.close();
+			}
+		} catch (Exception e) {
+			// db.close();
+			e.printStackTrace();
+		}
+
+		Log.d(TAG, "getAlertCount for level " + alertId + "returning " + ret);
+		if (ret == 1) {
+			return true;
+		}
+		return false;
+
+		// query(TABLE, null, null, null, null, null, GET_ALL_ORDER_BY);
 	}
 }

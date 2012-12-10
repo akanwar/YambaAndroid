@@ -9,16 +9,16 @@ import android.os.SystemClock;
 import android.util.Log;
 
 public class BootReceiver extends BroadcastReceiver {
-	//YambaApplication yamba;
+	// YambaApplication yamba;
 	private static final String TAG = BootReceiver.class.getSimpleName();
-	
+
 	@Override
 	public void onReceive(Context context, Intent callingIntent) {
 		// Check if we should do anything at boot at all
-			if ( ((YambaApplication) context.getApplicationContext()).setAlarms(context) ) {
-				Log.d(TAG, "setalarm was sucessful");				
-			} else {
-				Log.d(TAG, "setalarm did not work");				
-			}
+		if (((YambaApplication) context.getApplicationContext()).setAlarms(context)) {
+			Log.d(TAG, "setalarm was sucessful");
+		} else {
+			Log.d(TAG, "setalarm did not work");
+		}
 	}
 }
