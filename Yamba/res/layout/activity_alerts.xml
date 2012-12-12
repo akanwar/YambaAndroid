@@ -17,7 +17,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:background="#eeeeee"
+            android:background="#dddddd"
             android:gravity="center"
             android:text="@string/lastAlertsRefreshTime" />
     </LinearLayout>

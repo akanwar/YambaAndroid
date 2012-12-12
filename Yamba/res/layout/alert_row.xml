@@ -76,7 +76,9 @@
             android:lines="1"
             android:layout_weight="1"
             android:gravity="left"
-            android:text="@string/rowDataSourceInstance" />
+            android:text="@string/rowDataSourceInstance" 
+            android:ellipsize="end"
+            android:singleLine="true"/>
 
         <!--  -->
 

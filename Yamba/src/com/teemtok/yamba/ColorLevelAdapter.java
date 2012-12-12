@@ -36,7 +36,7 @@ public class ColorLevelAdapter extends SimpleCursorAdapter { //
 	SimpleDateFormat time_only_format = new SimpleDateFormat("hh:mm a");
 	SimpleDateFormat date_only_format = new SimpleDateFormat("yyyy MMM dd");
 
-	TextView textDate,textHost;
+	TextView textDate,textHost, textDatapoint;
 
 	// R.id.textAlertLevel, R.id.textprimaryKey};
 	// R.id.textThreshold, R.id.textValue,
@@ -61,10 +61,15 @@ public class ColorLevelAdapter extends SimpleCursorAdapter { //
 		int alertId = cursor.getInt(cursor.getColumnIndex(DbHelper.C_ALERTID)); //
 		TextView textLevel = (TextView) row.findViewById(R.id.textAlertLevel); //
 		textHost = (TextView) row.findViewById(R.id.textHost);
+		textDatapoint = (TextView) row.findViewById(R.id.textDatapoint);
+
 		if(yamba.getisReadinfo(alertId)) {
 			textHost.setTextAppearance(context, R.style.normalText);
+			textDatapoint.setTextAppearance(context, R.style.normalText);
 		} else {
 			textHost.setTextAppearance(context, R.style.boldText);
+			textDatapoint.setTextAppearance(context, R.style.boldText);
+
 		}
 		// //
 		if (level.equals("critical")) {

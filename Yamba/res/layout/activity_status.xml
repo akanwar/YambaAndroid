@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_margin="5dip"
-        android:background="#eeeeee"
+        android:background="#dddddd"
         android:orientation="vertical" >
 
         <ImageView

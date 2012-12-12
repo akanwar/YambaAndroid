@@ -128,6 +128,28 @@ public class StatusActivity extends Activity implements OnClickListener { //
 			Log.d(TAG, "Exception trying to login");
 		}
 	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		super.unregisterReceiver(receiver);
+		Log.d(TAG, "in OnPause");
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		Log.d(TAG, "in OnStop");
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		// Close the database
+		Log.d(TAG, "in OnDestroy");
+
+	}
+
 
 	@Override
 	public void onResume() {

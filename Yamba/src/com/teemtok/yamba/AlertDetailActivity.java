@@ -12,6 +12,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -29,6 +30,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +59,8 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 	String ackAlertId;
 	TextView idvalAckCommentList;
 	TextView idvalAckedList;
+	ScrollView idalertdetailsscrollview;
+	boolean ackworked; 
 
 	private YambaApplication yamba;
 
@@ -76,7 +80,10 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 		idvalthresholds = (TextView) findViewById(R.id.idvalthresholds);
 		idvalstartonlocaltime = (TextView) findViewById(R.id.idvalstartonlocaltime);
 		idalertacktitle = (TextView) findViewById(R.id.idAlertAckTitle);
+		idalertdetailsscrollview = (ScrollView) findViewById(R.id.idalertdetailsscrollview);
 
+		idalertdetailsscrollview.setScrollbarFadingEnabled(false);
+		
 		try {
 			idvalAckCommentList = (TextView) findViewById(R.id.idvalAckCommentList);
 			idvalAckedList = (TextView) findViewById(R.id.idvalAckedList);
@@ -204,8 +211,13 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		// (editAckText.getText().toString()); //
 		Log.d(TAG, "onClicked ACK Button");
-		getpushAck();
-
+		//getpushAck();
+		
+		idalertacktitle.setVisibility(View.INVISIBLE);
+		editAckText.setVisibility(View.INVISIBLE);
+		ackButton.setVisibility(View.INVISIBLE);
+		
+		new SendAckTask().execute("");
 	}
 
 	@Override
@@ -246,27 +258,74 @@ public class AlertDetailActivity extends Activity implements OnClickListener {
 				.concat(".logicmonitor.com/santaba/rpc/confirmAlerts?ids=")
 				.concat(idvalalertid.getText().toString().concat("&comment=").concat(editAckText.getText().toString().replaceAll(" ", "+")));
 		Log.d(TAG1, "This is ACK URL: " + LOMO_ACK_STRING);
-		boolean ackworked = yamba.pushAckandAckComment(LOMO_ACK_STRING);
+		ackworked = yamba.pushAckandAckComment(LOMO_ACK_STRING);
 		Log.d(TAG1, "done calling yamb push ack. success : " + ackworked);
 
-		editAckText.setVisibility(View.INVISIBLE);
-		ackButton.setVisibility(View.INVISIBLE);
+		
 
-		if (ackworked) {
-			text = "Alert id: ".concat(idvalalertid.getText().toString()).concat(" is acked.");
-			if (yamba.getLomoAlerts()) {
-				Log.d(TAG1, "Yamba Alerts call successfull");
-			} else {
-				Log.d(TAG1, "Yamba Alerts call unsuccessfull");
-			}
+	
 
-		} else {
-			text = "Alert id: ".concat(idvalalertid.getText().toString()).concat(" could not be acked.");
-		}
-
-		Toast toast = Toast.makeText(context, text, duration);
-		toast.show();
 
 	}
+	
+	
+	private class SendAckTask extends AsyncTask<String,String,String>{
+		
+		
+		final String TAG1 = TAG.concat("-SendAckTask");
+
+        int result;
+        
+        
+        
+    	Context context = getApplicationContext();
+		CharSequence text;
+		int duration = Toast.LENGTH_LONG;
+
+		
+		
+        @Override
+        protected void onPreExecute(){
+            //pd = ProgressDialog.show(Login.this,"","Retrieving Inbox...", true,false);
+			Log.d(TAG1, "Launched new thread ... ");
+
+        }
+
+        @Override
+        protected String doInBackground(String...strings){
+                    //do networking here
+        	getpushAck();  
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String unused){
+            //check result
+            //pd.dismiss();
+            //Intent intent = new Intent(Login.this,Warrior_MailActivity.class);
+
+        	if (ackworked) {
+    			text = "Alert id: ".concat(idvalalertid.getText().toString()).concat(" is acked.");
+    			if (yamba.setAlarms(context)) {
+    				Log.d(TAG1, "Yamba alarms retriggered");
+    			} else {
+    				Log.d(TAG1, "Yamba alarms could not be retriggered");
+    			}
+
+    		} else {
+    			text = "Alert id: ".concat(idvalalertid.getText().toString()).concat(" could not be acked.");
+    		}
+        	
+			Log.d(TAG1, "Done with new thread ... ");
+    		Toast toast = Toast.makeText(context, text, duration);
+    		toast.show();
+            finish();
+            //startActivity(intent);
+        }
+     }
+
+	
+	
 
 }

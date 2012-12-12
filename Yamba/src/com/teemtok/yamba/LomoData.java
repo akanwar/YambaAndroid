@@ -245,7 +245,7 @@ public class LomoData { //
 			e.printStackTrace();
 		}
 
-		Log.d(TAG, "getAlertCount for level " + level + "returning " + ret);
+		Log.d(TAG, "-getAlertCount for level " + level + " -- returning " + ret);
 		return ret;
 		// query(TABLE, null, null, null, null, null, GET_ALL_ORDER_BY);
 	}
@@ -283,7 +283,7 @@ public class LomoData { //
 			e.printStackTrace();
 		}
 
-		Log.d(TAG, "getAlertCount for level " + alertId + "returning " + ret);
+		Log.d(TAG, "-getisReadInfofromDb for level " + alertId + " -- returning " + ret);
 		if (ret == 1) {
 			return true;
 		}
