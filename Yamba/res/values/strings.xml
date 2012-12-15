@@ -68,7 +68,7 @@
     <string name="receive_alert_notifications_permission_label">Receive Alerts</string>
     <string name="send_alert_notifications_permission_label">Genrate Alerts</string>
     <string name="msgNotificationTitle">Logicmonitor Alerts</string>
-    <string name="msgNotificationMessage">click to see new alerts</string>
+    <string name="msgNotificationMessage">Click to see new alerts.</string>
     <string name="popupTitle">Need To Login!</string>
     <string name="buttonDismiss">Login Now</string>
     <string name="lastAlertsRefreshTime">Last Alerts Retrieved at</string>
