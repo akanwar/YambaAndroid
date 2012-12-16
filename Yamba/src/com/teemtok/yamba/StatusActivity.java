@@ -263,6 +263,7 @@ public class StatusActivity extends Activity implements OnClickListener { //
 		case R.id.itemPrefs:
 			startActivity(new Intent(this, PrefsActivity.class)); //
 			break;
+			/*
 		case R.id.itemServiceStart:
 			yamba.setAlarms(context1);
 			Log.d(TAG, "Service started check - adb shell dumpsys alarm");
@@ -271,6 +272,7 @@ public class StatusActivity extends Activity implements OnClickListener { //
 			yamba.stopAlarms(context1);
 			Log.d(TAG, "Service stoped check - adb shell dumpsys alarm");
 			break;
+			*/
 
 		}
 		return true; //

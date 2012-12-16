@@ -3,7 +3,10 @@ package com.teemtok.yamba;
 import com.teemtok.yamba.PullToRefreshListView;
 import com.teemtok.yamba.PullToRefreshListView.OnRefreshListener;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,11 +17,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -27,11 +35,13 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View.OnClickListener;
 
+@SuppressLint("NewApi")
 public class AlertActivity extends Activity implements OnClickListener, OnItemClickListener {
 
 	DbHelper dbHelper;
@@ -263,10 +273,37 @@ public class AlertActivity extends Activity implements OnClickListener, OnItemCl
 
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater(); //
+		inflater.inflate(R.menu.activity_alerts_menu, menu); //
+		return true;
+	}
+	
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
 
-	
-	
-	
+		Context context1 = getApplicationContext();
+
+		switch (item.getItemId()) { //
+		case R.id.itemPrefs:
+			startActivity(new Intent(this, PrefsActivity.class)); //
+			break;
+		case R.id.itemSearch:
+			onSearchRequested();
+			Log.d(TAG, "Calling Search");
+			break;
+			/*
+		case R.id.itemServiceStop:
+			yamba.stopAlarms(context1);
+			Log.d(TAG, "Service stoped check - adb shell dumpsys alarm");
+			break;
+			*/
+
+		}
+		return true; //
+	}
 
 	class AlertReceiver extends BroadcastReceiver { //
 		@Override

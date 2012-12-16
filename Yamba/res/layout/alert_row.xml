@@ -31,6 +31,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:text="@string/rowHost"
             android:textStyle="bold" />
 
@@ -39,7 +41,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:ellipsize="end"
             android:gravity="right"
+            android:singleLine="true"
             android:text="@string/rowDatapoint" />
 
         <!--
@@ -73,12 +77,12 @@
             android:id="@+id/textDataSourceInstance"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:lines="1"
             android:layout_weight="1"
-            android:gravity="left"
-            android:text="@string/rowDataSourceInstance" 
             android:ellipsize="end"
-            android:singleLine="true"/>
+            android:gravity="left"
+            android:lines="1"
+            android:singleLine="true"
+            android:text="@string/rowDataSourceInstance" />
 
         <!--  -->
 
@@ -110,13 +114,14 @@
             android:text="@string/rowValue" />
         -->
 
-
         <TextView
             android:id="@+id/textAlertLevel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:ellipsize="end"
             android:gravity="left"
+            android:singleLine="true"
             android:text="@string/rowAlertLevel" />
 
         <TextView
@@ -124,12 +129,11 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:ellipsize="end"
             android:gravity="right"
+            android:singleLine="true"
             android:text="@string/rowStartOnLocal"
             android:textColor="#aaaaaa" />
-
-        
-        
-        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>

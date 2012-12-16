@@ -114,6 +114,7 @@ public class LomoData { //
 			// database
 			if (doesTableExist(db)) {
 				db.delete(TABLE, null, null);
+				db.delete(TABLE_ISREAD, null, null);
 			}
 			onCreate(db); // run onCreate to get new database
 			Log.d(TAG1, "purgeData set us up the bomb");
@@ -137,7 +138,7 @@ public class LomoData { //
 		SQLiteDatabase db = this.dbHelper.getWritableDatabase(); //
 		try {
 			rowid = db.insertWithOnConflict(TABLE, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-			Log.d(TAG, "-insertOrIgnore: Insert happened and returned rowid = " + rowid);
+			//Log.d(TAG, "-insertOrIgnore: Insert happened and returned rowid = " + rowid);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			Log.d(TAG, "-insertOrIgnore: Database insert failed. rowid = " + rowid);
@@ -283,7 +284,7 @@ public class LomoData { //
 			e.printStackTrace();
 		}
 
-		Log.d(TAG, "-getisReadInfofromDb for level " + alertId + " -- returning " + ret);
+		//Log.d(TAG, "-getisReadInfofromDb for level " + alertId + " -- returning " + ret);
 		if (ret == 1) {
 			return true;
 		}

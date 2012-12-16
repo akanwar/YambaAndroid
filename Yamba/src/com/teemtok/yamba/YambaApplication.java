@@ -50,7 +50,7 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 	private boolean serviceRunning;
 	private boolean loggedIn;
 	private boolean isAlarmFiring = false;
-
+	private int countEventAlert = 0, countServiceAlert = 0, countAlert = 0; 
 	public static final int INTERVAL_NEVER = 0;
 	// private HttpClient httpclient = new DefaultHttpClient();
 	private CookieStore cookieStore = new BasicCookieStore();
@@ -150,6 +150,10 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 			setAlarms(getApplicationContext());
 
 		} else {
+			if (key.equals("Username") || key.equals("Company")) {
+				Log.d(TAG, "-onSharedPreferenceChanged: Calling Purge DB because username or company name changed");
+				lomodata.purgeDataBeforeInsert();
+			}
 			Log.d(TAG, "logging in because you changed " + key);
 			this.lomo = null;
 			try {
@@ -446,33 +450,72 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 		criticalCount = 0;
 		warnCount = 0;
 		errorCount = 0;
+		countEventAlert = 0;
+		countServiceAlert = 0;
+		countAlert = 0; 
 		int i;
 		for (i = 0; i < alertsobject.length(); i++) {
 			values.clear();
-			alertLevel = alertsobject.getJSONObject(i).getString("level");
-			values.put(LomoData.C_DATAPOINT, alertsobject.getJSONObject(i).getString("dataPoint"));
-			values.put(LomoData.C_DATASOURCE, alertsobject.getJSONObject(i).getString("dataSource"));
-			values.put(LomoData.C_DATASOURCEINSTANCE, alertsobject.getJSONObject(i).getString("dataSourceInstance"));
-			values.put(LomoData.C_HOST, alertsobject.getJSONObject(i).getString("host"));
-			values.put(LomoData.C_LEVEL, alertsobject.getJSONObject(i).getString("level"));
-			values.put(LomoData.C_VALUE, alertsobject.getJSONObject(i).getString("value"));
-			values.put(LomoData.C_THRESHOLDS, alertsobject.getJSONObject(i).getString("thresholds"));
-			values.put(LomoData.C_STARTONLOCALTIME, alertsobject.getJSONObject(i).getString("startOnLocal"));
-			values.put(LomoData.C_STARTONUNIXTIME, alertsobject.getJSONObject(i).getString("startOn"));
-			values.put(LomoData.C_ALERTID, alertsobject.getJSONObject(i).getInt("id"));
-			values.put(LomoData.C_ID, alertsobject.getJSONObject(i).getInt("id"));
-			boolean isackedFlag = alertsobject.getJSONObject(i).getBoolean("acked");
-			if (isackedFlag) {
-				values.put(LomoData.C_ISACKED, 1);
+			if (alertsobject.getJSONObject(i).getString("type").equals("alert")) {
+				alertLevel = alertsobject.getJSONObject(i).getString("level");
+				values.put(LomoData.C_DATAPOINT, alertsobject.getJSONObject(i).getString("dataPoint"));
+				values.put(LomoData.C_DATASOURCE, alertsobject.getJSONObject(i).getString("dataSource"));
+				values.put(LomoData.C_DATASOURCEINSTANCE, alertsobject.getJSONObject(i).getString("dataSourceInstance"));
+				values.put(LomoData.C_HOST, alertsobject.getJSONObject(i).getString("host"));
+				values.put(LomoData.C_LEVEL, alertsobject.getJSONObject(i).getString("level"));
+				values.put(LomoData.C_VALUE, alertsobject.getJSONObject(i).getString("value"));
+				values.put(LomoData.C_THRESHOLDS, alertsobject.getJSONObject(i).getString("thresholds"));
+				values.put(LomoData.C_STARTONLOCALTIME, alertsobject.getJSONObject(i).getString("startOnLocal"));
+				values.put(LomoData.C_STARTONUNIXTIME, alertsobject.getJSONObject(i).getString("startOn"));
+				values.put(LomoData.C_ALERTID, alertsobject.getJSONObject(i).getInt("id"));
+				values.put(LomoData.C_ID, alertsobject.getJSONObject(i).getInt("id"));
+				boolean isackedFlag = alertsobject.getJSONObject(i).getBoolean("acked");
+				if (isackedFlag) {
+					values.put(LomoData.C_ISACKED, 1);
+				} else {
+					values.put(LomoData.C_ISACKED, 0);
+				}
+				values.put(LomoData.C_ACKCOMMENT, alertsobject.getJSONObject(i).getString("ackComment").replaceAll("\n", ""));
+				values.put(LomoData.C_ISCURRENT, 1);
+				lomodata.insertOrIgnore(values);
+				countAlert++;
+			} else if (alertsobject.getJSONObject(i).getString("type").equals("eventalert")) {
+				//Log.d(TAG,"Event Alert Recieved not processing for now!");
+				alertLevel = alertsobject.getJSONObject(i).getString("level");
+				values.put(LomoData.C_DATAPOINT, "-");
+				values.put(LomoData.C_DATASOURCE, alertsobject.getJSONObject(i).getString("dataSource"));
+				values.put(LomoData.C_DATASOURCEINSTANCE, alertsobject.getJSONObject(i).getString("dataSourceInstance"));
+				values.put(LomoData.C_HOST, alertsobject.getJSONObject(i).getString("host"));
+				values.put(LomoData.C_LEVEL, alertsobject.getJSONObject(i).getString("level"));
+				values.put(LomoData.C_VALUE, alertsobject.getJSONObject(i).getString("value"));
+				values.put(LomoData.C_THRESHOLDS, "-");
+				values.put(LomoData.C_STARTONLOCALTIME, alertsobject.getJSONObject(i).getString("startOnLocal"));
+				values.put(LomoData.C_STARTONUNIXTIME, alertsobject.getJSONObject(i).getString("startOn"));
+				values.put(LomoData.C_ALERTID, alertsobject.getJSONObject(i).getInt("id"));
+				values.put(LomoData.C_ID, alertsobject.getJSONObject(i).getInt("id"));
+				boolean isackedFlag = alertsobject.getJSONObject(i).getBoolean("acked");
+				if (isackedFlag) {
+					values.put(LomoData.C_ISACKED, 1);
+				} else {
+					values.put(LomoData.C_ISACKED, 0);
+				}
+				values.put(LomoData.C_ACKCOMMENT, alertsobject.getJSONObject(i).getString("ackComment").replaceAll("\n", ""));
+				values.put(LomoData.C_ISCURRENT, 1);
+				lomodata.insertOrIgnore(values);
+				countEventAlert++;
+			} else if (alertsobject.getJSONObject(i).getString("type").equals("servicealert")) {
+				countServiceAlert++;
+				//Log.d(TAG,"Service Alert Recieved not processing for now!");
 			} else {
-				values.put(LomoData.C_ISACKED, 0);
+				Log.d(TAG,"New Alert type found: " + alertsobject.getJSONObject(i).getString("type"));
 			}
-			values.put(LomoData.C_ACKCOMMENT, alertsobject.getJSONObject(i).getString("ackComment").replaceAll("\n", ""));
-			values.put(LomoData.C_ISCURRENT, 1);
-			lomodata.insertOrIgnore(values);
+			
 
 		}
 		Log.d(TAG, "insertOrIgnore completed. Loop called " + i + "times");
+		Log.d(TAG, "countEventAlert " + countEventAlert);
+		Log.d(TAG, "countServiceAlert " + countServiceAlert);
+		Log.d(TAG, "countAlert " + countAlert);
 
 	}
 

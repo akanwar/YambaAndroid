@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">Logic Monitor Alerts</string>
@@ -76,7 +77,12 @@
     <string name="textBubble1">Click one of the three buttons to filter to that alert level. </string>
     <string name="textBubble2">Pull down main area to refresh.</string>
     <string name="textBubblebutton">OK</string>
-
+    <string name="app_label">Alert Search</string>
+    <string name="search_hint">Host Name</string>
+    <string name="titleSearchAlerts">Search Results</string>
+    <string name="menu_search">Search Results</string>
+    <string name="titleSearch">Search Alerts</string>
+    
     <string-array name="interval">
         <item>Never</item>
         <item>One minute</item>
@@ -96,5 +102,7 @@
         <item>1800000</item>
         <item>3600000</item>
     </string-array>
+
+    <string name="title_activity_searchable">SearchableActivity</string>
 
 </resources>

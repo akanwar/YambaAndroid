@@ -20,6 +20,7 @@
         android:entryValues="@array/intervalValues"
         android:key="interval"
         android:summary="@string/summaryUpdaterInterval"
-        android:title="@string/titleUpdaterInterval" />
+        android:title="@string/titleUpdaterInterval" 
+        android:defaultValue="0"/>
 
 </PreferenceScreen>
